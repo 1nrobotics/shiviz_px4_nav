@@ -1,65 +1,85 @@
 #!/bin/bash
 
-# Local Docker Build and Transfer Script
-# This script builds the image locally and transfers it to the remote device
+# Local Docker Build and Run Script
+# This script builds and runs the container locally on your development machine
 
 set -e
 
-# Configuration
-REMOTE_HOST="10.42.0.64"
-REMOTE_USER="compulab"
-IMAGE_NAME="1nrobotics/shiviz_px4_nav"
-TAG="local"
-DRONE_ID=${DRONE_ID:-1}
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
 
-echo "🚁 Local Docker Build and Transfer"
-echo "Target: $REMOTE_USER@$REMOTE_HOST"
-echo "Drone ID: $DRONE_ID"
+# Configuration
+IMAGE_NAME="1nrobotics/shiviz_px4_nav"
+CONTAINER_NAME="shiviz_nav_local"
+TAG=${1:-"local"}
+DRONE_ID=${2:-"1"}
+
+echo -e "${BLUE}🚁 Local Docker Build and Run${NC}"
+echo -e "Container: ${YELLOW}$CONTAINER_NAME${NC}"
+echo -e "Drone ID: ${YELLOW}$DRONE_ID${NC}"
+echo ""
+
+# Function to get docker command (with or without sudo)
+get_docker_cmd() {
+    if groups $USER | grep -q '\bdocker\b'; then
+        echo "docker"
+    else
+        echo "sudo docker"
+    fi
+}
+
+DOCKER_CMD=$(get_docker_cmd)
 
 # Step 1: Build image locally
+echo -e "${BLUE}🔨 Step 1: Building Docker image locally...${NC}"
+echo "Building for current platform..."
+
+$DOCKER_CMD build -t $IMAGE_NAME:$TAG .
+
+# Step 2: Stop and remove existing container if it exists
 echo ""
-echo "🔨 Step 1: Building Docker image locally..."
-echo "Building for ARM64 architecture..."
+echo -e "${BLUE}� Step 2: Stopping existing container...${NC}"
+$DOCKER_CMD stop $CONTAINER_NAME 2>/dev/null || true
+$DOCKER_CMD rm $CONTAINER_NAME 2>/dev/null || true
 
-# Build for ARM64 (assuming your local machine has buildx support)
-if docker buildx version >/dev/null 2>&1; then
-    docker buildx build --platform linux/arm64 -t $IMAGE_NAME:$TAG .
-else
-    echo "⚠️  buildx not available, building for current platform..."
-    docker build -t $IMAGE_NAME:$TAG .
-fi
-
-# Step 2: Save image to tar file
+# Step 3: Run new container locally
 echo ""
-echo "💾 Step 2: Saving Docker image..."
-docker save $IMAGE_NAME:$TAG > shiviz_image.tar
-echo "Image saved as shiviz_image.tar ($(du -h shiviz_image.tar | cut -f1))"
+echo -e "${BLUE}� Step 3: Starting new container locally...${NC}"
+$DOCKER_CMD run -d \
+    --name $CONTAINER_NAME \
+    --network host \
+    --privileged \
+    -v /dev:/dev \
+    -e ROS_MASTER_URI=http://localhost:11311 \
+    -e ROS_HOSTNAME=localhost \
+    -e ROS_IP=localhost \
+    -e PX4_SIM_HOST=localhost \
+    -e PX4_SIM_MODEL=iris \
+    -e VEHICLE_ID=$DRONE_ID \
+    -e DRONE_ID=$DRONE_ID \
+    --restart unless-stopped \
+    $IMAGE_NAME:$TAG \
+    bash -c 'tail -f /dev/null'
 
-# Step 3: Transfer image to remote
+# Step 4: Check status
 echo ""
-echo "📤 Step 3: Transferring image to remote device..."
-echo "This will require password authentication..."
-scp shiviz_image.tar $REMOTE_USER@$REMOTE_HOST:~/
-
-# Step 4: Load image on remote device
-echo ""
-echo "📥 Step 4: Loading image on remote device..."
-echo "This will require sudo password on the remote device."
-ssh -t $REMOTE_USER@$REMOTE_HOST "sudo docker load < ~/shiviz_image.tar && rm ~/shiviz_image.tar"
-
-# Step 5: Run container
-echo ""
-echo "🚀 Step 5: Starting container..."
-DOCKER_CMD="sudo docker run -d --name shiviz_nav_$DRONE_ID --restart unless-stopped -e DRONE_ID=$DRONE_ID $IMAGE_NAME:$TAG"
-ssh -t $REMOTE_USER@$REMOTE_HOST "$DOCKER_CMD"
-
-# Clean up local tar file
-rm shiviz_image.tar
+echo -e "${BLUE}📊 Step 4: Checking container status...${NC}"
+$DOCKER_CMD ps --filter name=$CONTAINER_NAME
 
 echo ""
-echo "✅ Deployment complete!"
-echo "Container 'shiviz_nav_$DRONE_ID' is running on $REMOTE_HOST"
+echo -e "${GREEN}✅ Local deployment completed!${NC}"
 echo ""
-echo "To check status: ssh $REMOTE_USER@$REMOTE_HOST 'sudo docker ps'"
-echo "To view logs: ssh $REMOTE_USER@$REMOTE_HOST 'sudo docker logs shiviz_nav_$DRONE_ID'"
-echo "To stop: ssh $REMOTE_USER@$REMOTE_HOST 'sudo docker stop shiviz_nav_$DRONE_ID'"
+echo -e "${BLUE}Useful commands:${NC}"
+echo "  View logs:    $DOCKER_CMD logs -f $CONTAINER_NAME"
+echo "  Stop:         $DOCKER_CMD stop $CONTAINER_NAME"
+echo "  Shell access: $DOCKER_CMD exec -it $CONTAINER_NAME bash"
+echo "  Status:       $DOCKER_CMD ps --filter name=$CONTAINER_NAME"
+echo ""
+echo -e "${YELLOW}To start ROS navigation manually:${NC}"
+echo "  $DOCKER_CMD exec -it $CONTAINER_NAME bash"
+echo "  # Inside container: source /catkin_ws/devel/setup.bash"
+echo "  # Then run: roslaunch shiviz_px4_nav px4_offboard.launch"
