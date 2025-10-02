@@ -1,0 +1,99 @@
+version: '3.8'
+
+services:
+  # Main navigation service
+  shiviz_nav:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    image: 1nrobotics/shiviz_px4_nav:${IMAGE_TAG:-local}
+    container_name: shiviz_nav
+    hostname: shiviz_nav
+    network_mode: "host"
+    privileged: true
+    volumes:
+      # Mount source code for development
+      - ./src:/catkin_ws/src/shiviz_px4_nav/src:rw
+      - ./include:/catkin_ws/src/shiviz_px4_nav/include:rw
+      - ./config:/catkin_ws/src/shiviz_px4_nav/config:rw
+      - ./launch:/catkin_ws/src/shiviz_px4_nav/launch:rw
+      # Mount for logs and data
+      - ./logs:/catkin_ws/logs:rw
+      # Mount for PX4 communication (if using serial)
+      - /dev:/dev:rw
+    environment:
+      - ROS_MASTER_URI=http://localhost:11311
+      - ROS_HOSTNAME=localhost  
+      - ROS_IP=localhost
+      - PX4_SIM_HOST=localhost
+      - PX4_SIM_MODEL=iris
+      - VEHICLE_ID=1
+      - DISPLAY=${DISPLAY}
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
+    command: >
+      bash -c "source /catkin_ws/devel/setup.bash && 
+               roslaunch shiviz_px4_nav px4_offboard.launch"
+
+  # PX4 SITL simulation (optional - for development)
+  px4_sitl:
+    image: px4io/px4-dev-simulation-focal:latest
+    container_name: px4_sitl
+    hostname: px4_sitl
+    network_mode: "host"
+    privileged: true
+    volumes:
+      - px4_data:/tmp
+    environment:
+      - DISPLAY=${DISPLAY}
+      - PX4_SIM_MODEL=iris
+      - PX4_SIM_WORLD=empty
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
+    command: >
+      bash -c "cd /home/user/Firmware && 
+               make px4_sitl gazebo"
+    profiles:
+      - simulation
+
+  # Ground Control Station (QGroundControl alternative)
+  mavproxy:
+    image: ardupilot/ardupilot-dev-base:latest
+    container_name: mavproxy
+    network_mode: "host"
+    volumes:
+      - mavproxy_logs:/logs
+    environment:
+      - MAVLINK_DIALECT=common
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
+    command: >
+      bash -c "mavproxy.py --master=udp:localhost:14540 --out=udp:localhost:14550"
+    profiles:
+      - gcs
+
+  # Development environment with GUI support
+  shiviz_dev:
+    extends: shiviz_nav
+    container_name: shiviz_dev
+    image: 1nrobotics/shiviz_px4_nav:${IMAGE_TAG:-local}
+    volumes:
+      # Additional development mounts
+      - .:/catkin_ws/src/shiviz_px4_nav:rw
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+    environment:
+      - DISPLAY=${DISPLAY}
+    command: bash
+    profiles:
+      - development
+
+volumes:
+  px4_data:
+  mavproxy_logs:
+
+networks:
+  default:
+    name: shiviz_network

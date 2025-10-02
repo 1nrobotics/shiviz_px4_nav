@@ -1,0 +1,77 @@
+# Git
+.git
+.gitignore
+.gitattributes
+*.git
+
+# Build artifacts
+build/
+devel/
+logs/
+install/
+.catkin_workspace
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Documentation
+*.md
+README*
+LICENSE*
+docs/
+media/
+
+# Docker files (don't include in build context)
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# Temporary and cache files
+*.tmp
+*.temp
+*.cache
+*.log
+.cache/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# OS generated files
+.Trashes
+ehthumbs.db
+
+# Large binary files and datasets
+*.bag
+*.pcd
+*.ply
+*.stl
+
+# Test and development files
+test/
+tests/
+*_test*
+*test_*
+
+# Backup files
+*.backup
+*.bak
+*.orig
+
+# Configuration files that might contain sensitive data
+.env
+.env.local
+.env.*
+
+# Package management
+node_modules/
+*.egg-info/
+dist/
+*.tar.gz
+*.zip
