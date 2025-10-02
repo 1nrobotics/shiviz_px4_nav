@@ -34,19 +34,19 @@ run_docker_cmd() {
 # Step 1: Copy files
 echo "📤 Step 1: Copying files..."
 # Create remote directory first
-ssh compulab@$REMOTE_HOST "mkdir -p ~/shiviz_px4_nav"
+ssh "$REMOTE_HOST" "mkdir -p ~/shiviz_px4_nav"
 
 rsync -av --progress \
     --exclude='.git' \
     --exclude='build' \
     --exclude='devel' \
-    ./ compulab@$REMOTE_HOST:~/shiviz_px4_nav/
+    ./ "$REMOTE_HOST":~/shiviz_px4_nav/
 
 echo "📦 Step 1.5: Ensuring submodules are copied..."
 # Copy yaml-cpp submodule files specifically
 if [ -d "thirdparty/yaml-cpp" ] && [ "$(ls -A thirdparty/yaml-cpp)" ]; then
     echo "Copying yaml-cpp submodule..."
-    rsync -av --progress thirdparty/yaml-cpp/ compulab@$REMOTE_HOST:~/shiviz_px4_nav/thirdparty/yaml-cpp/
+    rsync -av --progress thirdparty/yaml-cpp/ "$REMOTE_HOST":~/shiviz_px4_nav/thirdparty/yaml-cpp/
 else
     echo "⚠️  Warning: yaml-cpp submodule appears empty. Run 'git submodule update --init --recursive' locally first."
 fi
@@ -77,7 +77,7 @@ run_docker_cmd "docker run -d \\
     -e DRONE_ID=$DRONE_ID \\
     --restart unless-stopped \\
     ${IMAGE_NAME}:${TAG} \\
-    bash -c 'source /catkin_ws/devel/setup.bash && roslaunch shiviz_px4_nav px4_offboard.launch'"
+    bash -c 'tail -f /dev/null'"
 
 # Step 5: Check status
 echo -e "${BLUE}📊 Step 5: Checking status...${NC}"
@@ -90,3 +90,8 @@ echo "  View logs:    ssh $REMOTE_HOST 'sudo docker logs -f $CONTAINER_NAME'"
 echo "  Stop:         ssh $REMOTE_HOST 'sudo docker stop $CONTAINER_NAME'"
 echo "  Shell access: ssh $REMOTE_HOST 'sudo docker exec -it $CONTAINER_NAME bash'"
 echo "  Status:       ssh $REMOTE_HOST 'sudo docker ps'"
+echo ""
+echo -e "${YELLOW}To start ROS navigation manually:${NC}"
+echo "  ssh $REMOTE_HOST 'sudo docker exec -it $CONTAINER_NAME bash'"
+echo "  # Inside container: source /catkin_ws/devel/setup.bash"
+echo "  # Then run: roslaunch shiviz_px4_nav px4_offboard.launch"
