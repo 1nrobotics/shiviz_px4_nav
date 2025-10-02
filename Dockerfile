@@ -58,29 +58,23 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libyaml-cpp-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Install eCAL and dependencies for odom.py
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    capnproto \
-    libcapnp-dev \
-    python3-dev \
-    && rm -rf /var/lib/apt/lists/*
-
 # Install eCAL using Vilota software installer
 COPY src/VilotaSoftwareInstaller_v2.0-bba1a93f.py /tmp/installer.py
+# Ensure helper tools needed by the Vilota installer are available during build
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends python3-requests && \
+    apt-get install -y --no-install-recommends \
+        python3-requests \
+        software-properties-common \
+        sudo \
+        iputils-ping \
+        apt-transport-https \
+        ca-certificates \
+        gnupg && \
     rm -rf /var/lib/apt/lists/*
 
-# Install eCAL with Vilota installer (requires credentials to be passed as build args)
-ARG VILOTA_USERNAME=deployment
-ARG VILOTA_PASSWORD=vilota-dep
-RUN python3 /tmp/installer.py -s -u ${VILOTA_USERNAME} -p ${VILOTA_PASSWORD} --no-update-script || \
-    echo "Warning: Vilota installer failed, falling back to PPA installation" && \
-    apt-get update && \
-    apt-get install -y --no-install-recommends software-properties-common && \
-    add-apt-repository -y ppa:ecal/ecal-5.11 && \
-    apt-get update && \
-    apt-get install -y --no-install-recommends ecal && \
+# Install eCAL, capnp and dependencieswith Vilota installer (requires credentials to be passed as build args)
+RUN apt-get update && \
+    python3 /tmp/installer.py -s -u deployment -p vilota-dep --no-update-script && \
     rm -rf /var/lib/apt/lists/*
 
 # Install eCAL Python bindings explicitly
@@ -89,35 +83,45 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* || \
     echo "Warning: python3-ecal5 package not available"
 
-# Note: For ARM platforms (like Debian12-arm), you may need to:
-# 1. Download the specific .deb package: eCAL-5.11.8-Debian12-arm.deb
-# 2. Install it with: sudo apt-get install -y /path/to/eCAL-5.11.8-Debian12-arm.deb
-# This can be done by mounting the .deb file or downloading it during the build
-
-# Install Python dependencies
-RUN pip3 install --no-cache-dir --upgrade pip setuptools wheel
-
-# Try to install pycapnp 2.x first (has pre-built wheels)
-# If it fails due to Cython conflicts, fall back to older version
-RUN pip3 install --no-cache-dir "pycapnp>=2.0.0" || \
-    (echo "pycapnp 2.x failed, trying with Cython upgrade..." && \
-     pip3 install --no-cache-dir --force-reinstall "Cython>=3.0" && \
-     pip3 install --no-cache-dir "pycapnp>=2.0.0") || \
-    (echo "Falling back to pycapnp 1.x..." && \
-     pip3 install --no-cache-dir "Cython<3" && \
-     pip3 install --no-cache-dir "pycapnp==1.3.0") || \
-    echo "Warning: pycapnp installation failed, odom.py may not work"
-
-# Install other Python dependencies
-RUN pip3 install --no-cache-dir \
-    numpy \
-    scipy \
-    matplotlib \
-    argparse
-
 # Verify eCAL and pycapnp installation
 RUN python3 -c "import ecal; print('eCAL imported successfully')" || echo "Warning: eCAL import failed"
 RUN python3 -c "import capnp; print(f'pycapnp {capnp.__version__} imported successfully')" || echo "Warning: pycapnp import failed"
+
+# Ensure udev rules directory exists and add Movidius udev rule so installer
+# doesn't fail if /etc/udev is missing inside minimal images. We don't run
+# `udevadm` here because udev may not be active during image build; the
+# rule will be present at runtime and can be reloaded by the host/container
+# init if needed.
+RUN mkdir -p /etc/udev/rules.d && \
+    echo 'SUBSYSTEM=="usb", ATTRS{idVendor}=="03e7", MODE="0666"' > /etc/udev/rules.d/80-movidius.rules || true
+
+# Install eCAL and dependencies for odom.py
+# RUN apt-get update && apt-get install -y --no-install-recommends \
+#     capnproto \
+#     libcapnp-dev \
+#     python3-dev \
+#     && rm -rf /var/lib/apt/lists/*
+
+# Install other Python dependencies
+# RUN pip3 install --no-cache-dir \
+#     numpy \
+#     scipy \
+#     matplotlib \
+#     argparse
+
+# Install Python dependencies
+# RUN pip3 install --no-cache-dir --upgrade pip setuptools wheel
+
+# Try to install pycapnp 2.x first (has pre-built wheels)
+# If it fails due to Cython conflicts, fall back to older version
+# RUN pip3 install --no-cache-dir "pycapnp>=2.0.0" || \
+#     (echo "pycapnp 2.x failed, trying with Cython upgrade..." && \
+#      pip3 install --no-cache-dir --force-reinstall "Cython>=3.0" && \
+#      pip3 install --no-cache-dir "pycapnp>=2.0.0") || \
+#     (echo "Falling back to pycapnp 1.x..." && \
+#      pip3 install --no-cache-dir "Cython<3" && \
+#      pip3 install --no-cache-dir "pycapnp==1.3.0") || \
+#     echo "Warning: pycapnp installation failed, odom.py may not work"
 
 # Install MAVROS geographic datasets
 RUN wget https://raw.githubusercontent.com/mavlink/mavros/master/mavros/scripts/install_geographiclib_datasets.sh \

@@ -444,9 +444,11 @@ def configure_movidius_rules():
 
 
 def main():
-    if os.geteuid() == 0:
-        print("This script should not be run as root.")
-        sys.exit(1)
+    # Allow root for container use
+
+    # if os.geteuid() == 0:
+    #     print("This script should not be run as root.")
+    #     sys.exit(1)
 
     parser = argparse.ArgumentParser(
         description="Install Vilota VisualKit packages.",
@@ -476,7 +478,7 @@ def main():
     password = args.password or getpass.getpass("Enter password: ")
 
     print_info("checking network connectivity. This script requires Internet access to work.");
-    check_connectivity()
+    # check_connectivity()
 
     success, token = login(username, password)
     if not success:
@@ -539,7 +541,8 @@ def main():
     platform_suffix = determine_platform_suffix()
     
     install_ecal(token, platform_suffix)
-    install_rerun(token, platform_suffix)
+    # don't install rerun on Ubuntu 20.04 with python 3.8, as it will fail due to old pip
+    # install_rerun(token, platform_suffix)
     install_dependencies(platform_suffix)
 
     packages = []
@@ -580,7 +583,7 @@ def main():
 
     add_to_path_and_bashrc()
     chown_vilota_dir()
-    configure_movidius_rules()
+    # configure_movidius_rules()
     
     print_success("Installation Completed Successfully.")
 
