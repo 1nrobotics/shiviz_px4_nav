@@ -6,6 +6,28 @@ git clone git@github.com:mamariomiamo/shiviz_px4_navigation.git && git submodule
 ```
 colcon build
 ```
+
+## Running odom.py
+This script requires a specific set of Python dependencies to bridge eCAL messages to ROS. These instructions are for a system with Python 3.8 (like Ubuntu 20.04). Make sure ros and vk180 ecal is installed before this.
+
+```bash
+# System headers & tools
+sudo apt-get update
+sudo apt-get install -y capnproto libcapnp-dev python3-dev build-essential
+
+# Make sure pip is recent, then pin Cython < 3 (critical)
+python3 -m pip install --upgrade pip setuptools wheel
+python3 -m pip install "Cython<3"
+
+# Install a compatible pycapnp (these build well on Py3.8/20.04)
+python3 -m pip install "pycapnp==1.3.0" \
+  || python3 -m pip install --no-build-isolation "pycapnp==1.3.0" \
+  || python3 -m pip install --no-build-isolation "pycapnp==1.2.1"
+
+# Verify
+python3 -c "import capnp; print(capnp.__version__)"
+```
+
 # After launching PX4 gazebo sim
 ```
 roslaunch px4_offboard px4_offboard.launch
