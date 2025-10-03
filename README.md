@@ -2,6 +2,52 @@
 ```
 git clone git@github.com:mamariomiamo/shiviz_px4_navigation.git && git submodule update --init --recursive
 ```
+
+# Local Deployment (Docker)
+For easy local development and testing, use the provided Docker deployment script. This builds a containerized environment with all dependencies (ROS, eCAL, MAVROS, etc.) pre-installed.
+
+## Prerequisites
+- Docker installed and running
+- Git (for cloning)
+- Internet connection (for downloading dependencies)
+
+## Usage
+```bash
+# Build and run the container (default tag: local, drone ID: 1)
+./docker/local-deploy.sh
+
+# Or specify custom tag and drone ID
+./docker/local-deploy.sh custom-tag 2
+```
+
+## What It Does
+1. Builds the Docker image with ROS Noetic, eCAL, and your project code
+2. Stops/removes any existing container
+3. Runs a new container with host networking for ROS communication
+4. Automatically cleans up dangling Docker images
+
+## Running Your Code
+Once deployed, access the container:
+```bash
+sudo docker exec -it shiviz_nav_local bash
+```
+
+Inside the container, source ROS and run your scripts:
+```bash
+source /catkin_ws/devel/setup.bash
+python3 /catkin_ws/src/shiviz_px4_nav/src/odom.py
+```
+
+Or run the full ROS launch:
+```bash
+roslaunch shiviz_px4_nav px4_offboard.launch
+```
+
+## Stopping the Container
+```bash
+sudo docker stop shiviz_nav_local && sudo docker rm shiviz_nav_local
+```
+
 # Building
 ```
 colcon build

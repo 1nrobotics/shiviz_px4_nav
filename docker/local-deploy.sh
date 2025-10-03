@@ -40,6 +40,11 @@ echo "Building for current platform..."
 
 $DOCKER_CMD build -t $IMAGE_NAME:$TAG .
 
+# Step 1.5: Clean up dangling images
+echo ""
+echo -e "${BLUE}🧹 Step 1.5: Cleaning up dangling Docker images...${NC}"
+$DOCKER_CMD image prune -f
+
 # Step 2: Stop and remove existing container if it exists
 echo ""
 echo -e "${BLUE}� Step 2: Stopping existing container...${NC}"
