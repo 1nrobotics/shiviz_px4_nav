@@ -135,6 +135,9 @@ SHELL ["/bin/bash", "-c"]
 WORKDIR /catkin_ws/src/
 COPY . /catkin_ws/src/shiviz_px4_nav/
 
+# Copy eCAL configuration
+COPY src/ecal.ini /etc/ecal/ecal.ini
+
 # Initialize and build the workspace
 WORKDIR /catkin_ws/
 RUN source /opt/ros/noetic/setup.bash \
