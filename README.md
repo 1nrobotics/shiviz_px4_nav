@@ -48,6 +48,61 @@ roslaunch shiviz_px4_nav px4_offboard.launch
 sudo docker stop shiviz_nav_local && sudo docker rm shiviz_nav_local
 ```
 
+# Remote Deployment (Edge Device)
+For deploying to remote edge devices (like the Compulab device), use the interactive deployment script. This handles remote file transfer, Docker building, and container management over SSH.
+
+## Prerequisites
+- SSH access to remote device (password or key-based)
+- Docker installed on remote device
+- Remote device has internet access for dependency downloads
+- Git submodules initialized locally (`git submodule update --init --recursive`)
+
+## Usage
+```bash
+# Deploy to remote device (default: compulab@10.42.0.64, drone ID: 1, tag: local)
+./docker/interactive-deploy.sh
+
+# Or specify custom parameters
+./docker/interactive-deploy.sh local compulab@10.42.0.64 2
+```
+
+Parameters:
+- `TAG`: Docker image tag (default: `local`)
+- `REMOTE_HOST`: SSH target (default: `compulab@10.42.0.64`)
+- `DRONE_ID`: Vehicle ID for PX4 (default: `1`)
+
+## What It Does
+1. **File Transfer**: Copies project files and git submodules to remote device
+2. **Docker Build**: Builds the container image on the remote device (requires sudo)
+3. **Container Management**: Stops/removes existing containers, starts new one
+4. **Network Setup**: Configures host networking for ROS communication
+5. **Environment**: Sets PX4 and ROS environment variables
+
+## Remote Container Access
+```bash
+# Access container shell
+ssh compulab@10.42.0.64 'sudo docker exec -it shiviz_nav bash'
+
+# View container logs
+ssh compulab@10.42.0.64 'sudo docker logs -f shiviz_nav'
+
+# Stop container
+ssh compulab@10.42.0.64 'sudo docker stop shiviz_nav'
+```
+
+## Running ROS Navigation on Edge Device
+Inside the remote container:
+```bash
+source /catkin_ws/devel/setup.bash
+roslaunch shiviz_px4_nav px4_offboard.launch
+```
+
+## Troubleshooting
+- **SSH Connection Issues**: Ensure SSH key is set up or password authentication works
+- **Docker Build Failures**: Check remote device has internet access and sufficient disk space
+- **Time Sync Issues**: Remote device system time must be correct for apt package downloads
+- **Permission Issues**: Script requires sudo access on remote device for Docker operations
+
 # Building
 ```
 colcon build
