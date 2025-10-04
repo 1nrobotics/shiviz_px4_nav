@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Interactive Docker Deployment Script with Sudo Support
-# Handles sudo password prompts properly
+# Interactive Docker Deployment Script
+# Automatically configures Docker access without requiring sudo
 
 set -e
 
@@ -24,12 +24,42 @@ echo -e "Target: ${YELLOW}$REMOTE_HOST${NC}"
 echo -e "Drone ID: ${YELLOW}$DRONE_ID${NC}"
 echo ""
 
-# Function to run docker commands with proper sudo handling
+# Function to run docker commands (now without sudo after setup)
 run_docker_cmd() {
     local cmd="$1"
-    echo -e "${BLUE}Executing: ${YELLOW}sudo $cmd${NC}"
-    ssh -t "$REMOTE_HOST" "sudo $cmd"
+    echo -e "${BLUE}Executing: ${YELLOW}$cmd${NC}"
+    ssh "$REMOTE_HOST" "$cmd"
 }
+
+# Function to setup docker group access
+setup_docker_access() {
+    echo -e "${BLUE}🔧 Setting up Docker access without sudo...${NC}"
+    
+    # Check if user is already in docker group
+    if ssh "$REMOTE_HOST" "groups | grep -q '\bdocker\b'"; then
+        echo -e "${GREEN}✅ User already has Docker access${NC}"
+        return 0
+    fi
+    
+    echo -e "${YELLOW}Adding user to docker group...${NC}"
+    
+    # Add user to docker group
+    ssh -t "$REMOTE_HOST" "sudo usermod -aG docker \$USER"
+    
+    # Create or update docker group membership for current session
+    ssh -t "$REMOTE_HOST" "sudo sh -c 'newgrp docker <<EOF
+echo \"Docker group membership updated for current session\"
+EOF'"
+    
+    # Alternative approach: restart docker daemon and reload groups
+    ssh -t "$REMOTE_HOST" "sudo systemctl restart docker 2>/dev/null || true"
+    
+    echo -e "${GREEN}✅ Docker access configured${NC}"
+    echo -e "${YELLOW}Note: You may need to log out and back in for group changes to take full effect${NC}"
+}
+
+# Step 0: Setup Docker access
+setup_docker_access
 
 # Step 1: Copy files
 echo "📤 Step 1: Copying files..."
@@ -53,7 +83,6 @@ fi
 
 # Step 2: Build image
 echo -e "${BLUE}🔨 Step 2: Building Docker image...${NC}"
-echo "This will require sudo password on the remote device."
 run_docker_cmd "docker build -t ${IMAGE_NAME}:${TAG} ~/shiviz_px4_nav/"
 
 # Step 3: Stop existing container
@@ -86,12 +115,12 @@ run_docker_cmd "docker ps --filter name=$CONTAINER_NAME"
 echo -e "${GREEN}✅ Deployment completed!${NC}"
 echo ""
 echo -e "${BLUE}Useful commands:${NC}"
-echo "  View logs:    ssh $REMOTE_HOST 'sudo docker logs -f $CONTAINER_NAME'"
-echo "  Stop:         ssh $REMOTE_HOST 'sudo docker stop $CONTAINER_NAME'"
-echo "  Shell access: ssh $REMOTE_HOST 'sudo docker exec -it $CONTAINER_NAME bash'"
-echo "  Status:       ssh $REMOTE_HOST 'sudo docker ps'"
+echo "  View logs:    ssh $REMOTE_HOST 'docker logs -f $CONTAINER_NAME'"
+echo "  Stop:         ssh $REMOTE_HOST 'docker stop $CONTAINER_NAME'"
+echo "  Shell access: ssh $REMOTE_HOST 'docker exec -it $CONTAINER_NAME bash'"
+echo "  Status:       ssh $REMOTE_HOST 'docker ps'"
 echo ""
 echo -e "${YELLOW}To start ROS navigation manually:${NC}"
-echo "  ssh $REMOTE_HOST 'sudo docker exec -it $CONTAINER_NAME bash'"
+echo "  ssh $REMOTE_HOST 'docker exec -it $CONTAINER_NAME bash'"
 echo "  # Inside container: source /catkin_ws/devel/setup.bash"
 echo "  # Then run: roslaunch shiviz_px4_nav px4_offboard.launch"
