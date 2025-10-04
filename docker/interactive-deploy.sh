@@ -58,10 +58,41 @@ EOF'"
     echo -e "${YELLOW}Note: You may need to log out and back in for group changes to take full effect${NC}"
 }
 
+# Function to synchronize time between host and edge device
+sync_time() {
+    echo -e "${BLUE}⏰ Synchronizing time with edge device...${NC}"
+    
+    # Get current date/time from host
+    local current_datetime=$(date '+%Y-%m-%d %H:%M:%S')
+    local current_epoch=$(date +%s)
+    
+    echo -e "${BLUE}Host time: ${YELLOW}$current_datetime${NC}"
+    
+    # Set time on edge device
+    ssh -t "$REMOTE_HOST" "sudo date -s '$current_datetime'"
+    
+    # Verify the time was set correctly
+    local edge_datetime=$(ssh "$REMOTE_HOST" "date '+%Y-%m-%d %H:%M:%S'")
+    echo -e "${BLUE}Edge device time: ${YELLOW}$edge_datetime${NC}"
+    
+    # Check if times are reasonably close (within 10 seconds)
+    local edge_epoch=$(ssh "$REMOTE_HOST" "date +%s")
+    local time_diff=$((edge_epoch - current_epoch))
+    local abs_diff=${time_diff#-}
+    
+    if [[ $abs_diff -le 10 ]]; then
+        echo -e "${GREEN}✅ Time synchronized successfully${NC}"
+    else
+        echo -e "${YELLOW}⚠️  Time difference: ${abs_diff} seconds${NC}"
+        echo -e "${YELLOW}Time synchronization may need manual adjustment${NC}"
+    fi
+}
+
 # Step 0: Setup Docker access
 setup_docker_access
 
-# Step 1: Copy files
+# Step 0.5: Synchronize time
+sync_time
 echo "📤 Step 1: Copying files..."
 # Create remote directory first
 ssh "$REMOTE_HOST" "mkdir -p ~/shiviz_px4_nav"
