@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-    <name>px4_offboard</name>
+    <name>shiviz_px4_nav</name>
     <version>0.0.1</version>
-    <description>The px4_offboard package</description>
+    <description>The Shiviz PX4 Navigation package</description>
     <maintainer email="mazt1025@hotmail.com">zhengtian.ma</maintainer>
     <license>TODO</license>
 

@@ -1,3 +1,9 @@
+// Copyright 2024 1nrobotics
+//
+// Waypoint Navigator Header
+// Defines the WaypointNavigator class for autonomous waypoint navigation
+// using PX4 offboard control via MAVROS.
+
 #pragma once
 
 #include <memory>

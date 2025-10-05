@@ -1,3 +1,9 @@
+// Copyright 2024 1nrobotics
+// 
+// Waypoint Navigator Implementation
+// This file implements the WaypointNavigator class for autonomous
+// waypoint navigation using PX4 offboard control via MAVROS.
+
 #include "waypoint_navigator/waypoint_navigator.hpp"
 
 #include <iostream>
@@ -6,6 +12,7 @@
 #include <chrono>
 #include <yaml-cpp/yaml.h>
 #include <fstream>
+
 using namespace std::chrono;
 
 namespace waypoint_navigator

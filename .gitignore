@@ -40,5 +40,31 @@
 # debug information files
 *.dwo
 
+# IDE and build directories
 .vscode/
 build/
+devel/
+install/
+log/
+logs/
+
+# ROS
+*.bag
+*.bag.active
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.Python
+
+# Backup files
+*.backup
+*_OLD.md
+*.swp
+*.swo
+*~
+
+# Docker
+.dockerignore
