@@ -34,7 +34,7 @@ services:
     restart: unless-stopped
     command: >
       bash -c "source /catkin_ws/devel/setup.bash && 
-               roslaunch shiviz_px4_nav px4_offboard.launch"
+               roslaunch shiviz_px4_nav shiviz_px4_nav.launch"
 
   # PX4 SITL simulation (optional - for development)
   px4_sitl:

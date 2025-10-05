@@ -124,7 +124,7 @@ source /catkin_ws/devel/setup.bash
 python3 /catkin_ws/src/shiviz_px4_nav/src/odom.py
 
 # Or run the full ROS launch
-roslaunch shiviz_px4_nav px4_offboard.launch
+roslaunch shiviz_px4_nav shiviz_px4_nav.launch
 ```
 
 #### Stopping the Container
@@ -178,7 +178,7 @@ Inside the remote container:
 
 ```bash
 source /catkin_ws/devel/setup.bash
-roslaunch shiviz_px4_nav px4_offboard.launch
+roslaunch shiviz_px4_nav shiviz_px4_nav.launch
 ```
 
 ## Usage
@@ -196,7 +196,7 @@ make px4_sitl gazebo
 2. Launch the navigation node:
 
 ```bash
-roslaunch shiviz_px4_nav px4_offboard.launch
+roslaunch shiviz_px4_nav shiviz_px4_nav.launch
 ```
 
 ### With Actual Drone
@@ -258,7 +258,7 @@ Verify in QGroundControl Flight Modes Channel Monitor that channels 7 and 8 resp
 #### Launch Command
 
 ```bash
-roslaunch shiviz_px4_nav px4_offboard.launch use_rc:=true use_sim:=false
+roslaunch shiviz_px4_nav shiviz_px4_nav.launch use_rc:=true use_sim:=false
 ```
 
 ## Configuration

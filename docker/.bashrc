@@ -27,7 +27,7 @@ alias catkin_build_release='catkin build -DCMAKE_BUILD_TYPE=Release'
 alias catkin_clean_all='catkin clean --all'
 
 # Navigation specific aliases
-alias nav_launch='roslaunch shiviz_px4_nav px4_offboard.launch'
+alias nav_launch='roslaunch shiviz_px4_nav shiviz_px4_nav.launch'
 alias nav_takeoff='rosservice call /waypoint_navigator/takeoff'
 alias nav_land='rosservice call /waypoint_navigator/land'
 alias nav_mission='rosservice call /waypoint_navigator/start_mission'
