@@ -96,8 +96,8 @@ class MavrosVisionPosePublisher:
                                  [0, 0, -1]])
         # 将NED四元数转换为旋转矩阵
         R_ned = tf.transformations.quaternion_matrix([q_ned_x, q_ned_y, q_ned_z, q_ned_w])[:3, :3]
-        # 应用ENU转换
-        R_enu = R_ned @ R_ned_to_enu.T
+        # 应用ENU转换（修正乘法顺序）
+        R_enu = R_ned_to_enu @ R_ned
         # 转换回四元数（x,y,z,w顺序）
         q_enu = tf.transformations.quaternion_from_matrix(
             np.vstack((np.hstack((R_enu, np.zeros((3,1)))), [0,0,0,1]))
@@ -106,38 +106,6 @@ class MavrosVisionPosePublisher:
 
         return x_enu, y_enu, z_enu, q_enu_w, q_enu_x, q_enu_y, q_enu_z
     
-    def ned_to_enu_1(self, x_ned, y_ned, z_ned, q_ned_w, q_ned_x, q_ned_y, q_ned_z):
-        """
-        修正版：NED坐标系→ENU坐标系转换（PX4要求ENU输入）
-        位置：x_ENU = y_NED, y_ENU = x_NED, z_ENU = -z_NED（原逻辑正确）
-        姿态：NED四元数 → ENU四元数（修正旋转逻辑）
-        """
-        # 1. 位置转换（原逻辑正确，保留）
-        x_enu = y_ned
-        y_enu = x_ned
-        z_enu = -z_ned
-
-        # 2. 姿态转换：修正旋转逻辑
-        # 步骤1：NED姿态 → 机体姿态（先绕X轴转180°，抵消NED与ENU的Z轴方向差异）
-        # 绕X轴转180°的四元数（x,y,z,w）：(1, 0, 0, 0)
-        q_rot_x180 = np.array([1.0, 0.0, 0.0, 0.0])  # x,y,z,w
-        # 步骤2：绕Z轴转-90°（顺时针），对齐NED与ENU的XY轴
-        # 绕Z轴转-90°的四元数（x,y,z,w）：(0, 0, -√2/2, √2/2) ≈ (0,0,-0.7071,0.7071)
-        q_rot_z_neg90 = np.array([0.0, 0.0, -0.70710678, 0.70710678])  # x,y,z,w
-
-        # 将NED四元数转换为（x,y,z,w）格式（与tf一致）
-        q_ned = np.array([q_ned_x, q_ned_y, q_ned_z, q_ned_w])
-
-        # 姿态旋转：先乘X轴180°，再乘Z轴-90°（tf.transformations.quaternion_multiply是右乘）
-        q_temp = tf.transformations.quaternion_multiply(q_ned, q_rot_x180)
-        q_enu = tf.transformations.quaternion_multiply(q_temp, q_rot_z_neg90)
-
-        # 提取ENU四元数的w,x,y,z（tf输出是x,y,z,w，需对应PoseStamped字段）
-        q_enu_x, q_enu_y, q_enu_z, q_enu_w = q_enu[0], q_enu[1], q_enu[2], q_enu[3]
-
-        return x_enu, y_enu, z_enu, q_enu_w, q_enu_x, q_enu_y, q_enu_z
-
-
     def ecal_msg_callback(self, topic_name, msg, time_ecal):
         """eCAL消息回调：解析→转换→发布到/mavros/vision_pose/pose"""
         # 解析eCAL的Odometry3d消息
