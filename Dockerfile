@@ -59,7 +59,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Install eCAL using Vilota software installer
-COPY src/VilotaSoftwareInstaller_v2.0-bba1a93f.py /tmp/installer.py
+COPY tools/VilotaSoftwareInstaller_v2.0-bba1a93f.py /tmp/installer.py
 # Ensure helper tools needed by the Vilota installer are available during build
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
@@ -136,7 +136,7 @@ WORKDIR /catkin_ws/src/
 COPY . /catkin_ws/src/shiviz_px4_nav/
 
 # Copy eCAL configuration
-COPY src/ecal.ini /etc/ecal/ecal.ini
+COPY tools/ecal.ini /etc/ecal/ecal.ini
 
 # Initialize and build the workspace
 WORKDIR /catkin_ws/
