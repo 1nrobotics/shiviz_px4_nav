@@ -1,4 +1,4 @@
-#include "waypoint_navigator/waypoint_navigator.hpp"
+#include "waypoint_navigator.hpp"
 
 int main(int argc, char **argv)
 {
