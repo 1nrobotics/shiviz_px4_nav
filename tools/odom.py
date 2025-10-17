@@ -159,8 +159,14 @@ class MavrosVisionPosePublisher:
                 )
             else:
                 # 若已是ENU，直接使用
-                x, y, z = x_ned, y_ned, z_ned
-                q_w, q_x, q_y, q_z = q_ned_w, q_ned_x, q_ned_y, q_ned_z
+                x, y, z = -x_ned, -y_ned, z_ned
+                q_w, q_x, q_y, q_z = q_ned_w, -q_ned_x, -q_ned_y, q_ned_z
+
+
+            if odom_msg.header.seq % 100 == 0:
+                print(f"转换后位置 (ENU): ({x:.2f}, {y:.2f}, {z:.2f})")
+                print(f"转换后四元数 (ENU): w={q_w:.3f}, x={q_x:.3f}, y={q_y:.3f}, z={q_z:.3f}")
+                print(f"euler angles (ENU): {tf.transformations.euler_from_quaternion([q_x, q_y, q_z, q_w])}")
 
             # 映射到位姿消息
             pose_stamped.pose.position.x = x
