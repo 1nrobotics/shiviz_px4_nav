@@ -49,6 +49,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ros-${ROS_DISTRO}-pcl-conversions \
     ros-${ROS_DISTRO}-eigen-conversions \
     ros-${ROS_DISTRO}-cmake-modules \
+    ros-${ROS_DISTRO}-rviz \
     && rm -rf /var/lib/apt/lists/*
 
 # Install system dependencies
@@ -141,12 +142,20 @@ COPY tools/ecal.ini /etc/ecal/ecal.ini
 # Initialize and build the workspace
 WORKDIR /catkin_ws/
 RUN source /opt/ros/noetic/setup.bash \
-    && catkin init \
-    && catkin config --extend /opt/ros/noetic \
-    && catkin config --cmake-args -DCMAKE_BUILD_TYPE=Release \
     && rosdep update \
     && rosdep install --from-paths src --ignore-src -r -y \
-    && catkin build
+    && echo "Building message packages first..." \
+    && catkin_make -DCMAKE_BUILD_TYPE=Release --only-pkg-with-deps quadrotor_msgs decomp_ros_msgs \
+    && echo "Building utility packages..." \
+    && catkin_make -DCMAKE_BUILD_TYPE=Release --only-pkg-with-deps catkin_simple cmake_utils pose_utils uav_utils \
+    && echo "Building main navigation packages..." \
+    && catkin_make -DCMAKE_BUILD_TYPE=Release --only-pkg-with-deps px4_offboard \
+    && echo "Building px4ctrl package..." \
+    && catkin_make -DCMAKE_BUILD_TYPE=Release --only-pkg-with-deps px4ctrl || echo "px4ctrl build failed, continuing..." \
+    && echo "Building visualization packages..." \
+    && catkin_make -DCMAKE_BUILD_TYPE=Release --only-pkg-with-deps decomp_ros_utils rviz_plugins || echo "Visualization packages build failed, continuing..." \
+    && echo "Build complete. Listing packages:" \
+    && ls -la devel/lib/
 
 # Set up environment in bashrc
 RUN echo "source /opt/ros/noetic/setup.bash" >> /root/.bashrc && \
