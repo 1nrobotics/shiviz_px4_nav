@@ -146,7 +146,10 @@ RUN source /opt/ros/noetic/setup.bash \
     && catkin config --cmake-args -DCMAKE_BUILD_TYPE=Release \
     && rosdep update \
     && rosdep install --from-paths src --ignore-src -r -y \
-    && catkin build
+    && echo "Building all packages in workspace..." \
+    && catkin build --verbose \
+    && echo "Build complete. Packages built:" \
+    && catkin list
 
 # Set up environment in bashrc
 RUN echo "source /opt/ros/noetic/setup.bash" >> /root/.bashrc && \

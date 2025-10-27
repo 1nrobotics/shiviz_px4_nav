@@ -37,6 +37,11 @@ DOCKER_CMD=$(get_docker_cmd)
 # Step 1: Build image locally
 echo -e "${BLUE}🔨 Step 1: Building Docker image locally...${NC}"
 echo "Building for current platform..."
+echo -e "${YELLOW}This will build all ROS nodes in the src/ folder:${NC}"
+echo "  - px4_offboard_node"
+echo "  - px4ctrl"
+echo "  - utils/* (all utility packages)"
+echo ""
 
 $DOCKER_CMD build -t $IMAGE_NAME:$TAG .
 
