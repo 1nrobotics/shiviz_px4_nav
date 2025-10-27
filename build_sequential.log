@@ -1,0 +1,1820 @@
+[0;34m🚁 Local Docker Build and Run[0m
+Container: [1;33mshiviz_nav_local[0m
+Drone ID: [1;33m1[0m
+
+[0;34m🔨 Step 1: Building Docker image locally...[0m
+Building for current platform...
+[1;33mThis will build all ROS nodes in the src/ folder:[0m
+  - px4_offboard_node
+  - px4ctrl
+  - utils/* (all utility packages)
+
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 6.93kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/ros:noetic-ros-core-focal
+#2 DONE 1.8s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 811B done
+#3 DONE 0.0s
+
+#4 [ 1/24] FROM docker.io/library/ros:noetic-ros-core-focal@sha256:fd6279f04e51fa61201a791da9a156129941887b95b614ae0cec7865ef49de4f
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 75.20kB 0.0s done
+#5 DONE 0.0s
+
+#6 [11/24] RUN apt-get update &&     apt-get install -y --no-install-recommends python3-ecal5 &&     rm -rf /var/lib/apt/lists/* ||     echo "Warning: python3-ecal5 package not available"
+#6 CACHED
+
+#7 [ 6/24] RUN apt-get update && apt-get install -y --no-install-recommends     ros-noetic-pcl-ros     ros-noetic-pcl-conversions     ros-noetic-eigen-conversions     ros-noetic-cmake-modules     ros-noetic-rviz     && rm -rf /var/lib/apt/lists/*
+#7 CACHED
+
+#8 [18/24] COPY tools/ecal.ini /etc/ecal/ecal.ini
+#8 CACHED
+
+#9 [15/24] RUN wget https://raw.githubusercontent.com/mavlink/mavros/master/mavros/scripts/install_geographiclib_datasets.sh     && bash ./install_geographiclib_datasets.sh     && rm install_geographiclib_datasets.sh
+#9 CACHED
+
+#10 [12/24] RUN python3 -c "import ecal; print('eCAL imported successfully')" || echo "Warning: eCAL import failed"
+#10 CACHED
+
+#11 [ 8/24] COPY tools/VilotaSoftwareInstaller_v2.0-bba1a93f.py /tmp/installer.py
+#11 CACHED
+
+#12 [13/24] RUN python3 -c "import capnp; print(f'pycapnp {capnp.__version__} imported successfully')" || echo "Warning: pycapnp import failed"
+#12 CACHED
+
+#13 [16/24] WORKDIR /catkin_ws/src/
+#13 CACHED
+
+#14 [ 3/24] RUN rosdep init &&     rosdep update --rosdistro noetic
+#14 CACHED
+
+#15 [ 5/24] RUN apt-get update && apt-get install -y --no-install-recommends     ros-noetic-mavlink     ros-noetic-mavros     ros-noetic-mavros-msgs     ros-noetic-mavros-extras     ros-noetic-geometry-msgs     ros-noetic-tf2-ros     ros-noetic-tf2-geometry-msgs     && rm -rf /var/lib/apt/lists/*
+#15 CACHED
+
+#16 [14/24] RUN mkdir -p /etc/udev/rules.d &&     echo 'SUBSYSTEM=="usb", ATTRS{idVendor}=="03e7", MODE="0666"' > /etc/udev/rules.d/80-movidius.rules || true
+#16 CACHED
+
+#17 [ 9/24] RUN apt-get update &&     apt-get install -y --no-install-recommends         python3-requests         software-properties-common         sudo         iputils-ping         apt-transport-https         ca-certificates         gnupg &&     rm -rf /var/lib/apt/lists/*
+#17 CACHED
+
+#18 [10/24] RUN apt-get update &&     python3 /tmp/installer.py -s -u deployment -p vilota-dep --no-update-script &&     rm -rf /var/lib/apt/lists/*
+#18 CACHED
+
+#19 [ 4/24] RUN apt-get update && apt-get install -y --no-install-recommends     ros-noetic-ros-base=1.5.0-1*     && rm -rf /var/lib/apt/lists/*
+#19 CACHED
+
+#20 [ 7/24] RUN apt-get update && apt-get install -y --no-install-recommends     libeigen3-dev     libpcl-dev     libyaml-cpp-dev     && rm -rf /var/lib/apt/lists/*
+#20 CACHED
+
+#21 [17/24] COPY . /catkin_ws/src/shiviz_px4_nav/
+#21 CACHED
+
+#22 [ 2/24] RUN apt-get update && apt-get install --no-install-recommends -y     vim     wget     curl     git     tmux     iproute2     build-essential     python3-rosdep     python3-rosinstall     python3-vcstools     python3-catkin-tools     python3-pip     xmlstarlet     && rm -rf /var/lib/apt/lists/*
+#22 CACHED
+
+#23 [19/24] WORKDIR /catkin_ws/
+#23 CACHED
+
+#24 [20/24] RUN source /opt/ros/noetic/setup.bash     && rosdep update     && rosdep install --from-paths src --ignore-src -r -y     && echo "Building message packages first..."     && catkin_make -DCMAKE_BUILD_TYPE=Release --only-pkg-with-deps quadrotor_msgs decomp_ros_msgs     && echo "Building utility packages..."     && catkin_make -DCMAKE_BUILD_TYPE=Release --only-pkg-with-deps catkin_simple cmake_utils pose_utils uav_utils     && echo "Building main navigation packages..."     && catkin_make -DCMAKE_BUILD_TYPE=Release --only-pkg-with-deps px4_offboard     && echo "Building px4ctrl package..."     && catkin_make -DCMAKE_BUILD_TYPE=Release --only-pkg-with-deps px4ctrl || echo "px4ctrl build failed, continuing..."     && echo "Building visualization packages..."     && catkin_make -DCMAKE_BUILD_TYPE=Release --only-pkg-with-deps decomp_ros_utils rviz_plugins || echo "Visualization packages build failed, continuing..."     && echo "Build complete. Listing packages:"     && ls -la devel/lib/
+#24 5.581 Warning: running 'rosdep update' as root is not recommended.
+#24 5.581   You should run 'sudo rosdep fix-permissions' and invoke 'rosdep update' again without sudo.
+#24 5.581 reading in sources list data from /etc/ros/rosdep/sources.list.d
+#24 5.581 Hit https://raw.githubusercontent.com/ros/rosdistro/master/rosdep/osx-homebrew.yaml
+#24 5.581 Hit https://raw.githubusercontent.com/ros/rosdistro/master/rosdep/base.yaml
+#24 5.581 Hit https://raw.githubusercontent.com/ros/rosdistro/master/rosdep/python.yaml
+#24 5.581 Hit https://raw.githubusercontent.com/ros/rosdistro/master/rosdep/ruby.yaml
+#24 5.581 Hit https://raw.githubusercontent.com/ros/rosdistro/master/releases/fuerte.yaml
+#24 5.581 Query rosdistro index https://raw.githubusercontent.com/ros/rosdistro/master/index-v4.yaml
+#24 5.581 Skip end-of-life distro "ardent"
+#24 5.581 Skip end-of-life distro "bouncy"
+#24 5.581 Skip end-of-life distro "crystal"
+#24 5.581 Skip end-of-life distro "dashing"
+#24 5.581 Skip end-of-life distro "eloquent"
+#24 5.581 Skip end-of-life distro "foxy"
+#24 5.581 Skip end-of-life distro "galactic"
+#24 5.581 Skip end-of-life distro "groovy"
+#24 5.581 Add distro "humble"
+#24 5.581 Skip end-of-life distro "hydro"
+#24 5.581 Skip end-of-life distro "indigo"
+#24 5.581 Skip end-of-life distro "iron"
+#24 5.581 Skip end-of-life distro "jade"
+#24 5.581 Add distro "jazzy"
+#24 5.581 Add distro "kilted"
+#24 5.581 Skip end-of-life distro "kinetic"
+#24 5.581 Skip end-of-life distro "lunar"
+#24 5.581 Skip end-of-life distro "melodic"
+#24 5.581 Skip end-of-life distro "noetic"
+#24 5.581 Add distro "rolling"
+#24 5.581 updated cache in /root/.ros/rosdep/sources.cache
+#24 5.923 #All required rosdeps installed successfully
+#24 5.923 ERROR: the following packages/stacks could not have their rosdep keys resolved
+#24 5.923 to system dependencies:
+#24 5.923 rviz_plugins: Cannot locate rosdep definition for [multi_map_server]
+#24 5.923 Continuing to install resolvable dependencies...
+#24 5.955 Building message packages first...
+#24 6.034 -- The C compiler identification is GNU 9.4.0
+#24 6.073 -- The CXX compiler identification is GNU 9.4.0
+#24 6.077 -- Check for working C compiler: /usr/bin/cc
+#24 6.120 -- Check for working C compiler: /usr/bin/cc -- works
+#24 6.120 -- Detecting C compiler ABI info
+#24 6.164 -- Detecting C compiler ABI info - done
+#24 6.172 -- Detecting C compile features
+#24 6.172 -- Detecting C compile features - done
+#24 6.175 -- Check for working CXX compiler: /usr/bin/c++
+#24 6.222 -- Check for working CXX compiler: /usr/bin/c++ -- works
+#24 6.223 -- Detecting CXX compiler ABI info
+#24 6.271 -- Detecting CXX compiler ABI info - done
+#24 6.279 -- Detecting CXX compile features
+#24 6.280 -- Detecting CXX compile features - done
+#24 6.329 -- Using CATKIN_DEVEL_PREFIX: /catkin_ws/devel
+#24 6.329 -- Using CMAKE_PREFIX_PATH: /opt/ros/noetic
+#24 6.329 -- This workspace overlays: /opt/ros/noetic
+#24 6.344 -- Found PythonInterp: /usr/bin/python3 (found suitable version "3.8.10", minimum required is "3") 
+#24 6.344 -- Using PYTHON_EXECUTABLE: /usr/bin/python3
+#24 6.344 -- Using Debian Python package layout
+#24 6.364 -- Found PY_em: /usr/lib/python3/dist-packages/em.py  
+#24 6.364 -- Using empy: /usr/lib/python3/dist-packages/em.py
+#24 6.440 -- Using CATKIN_ENABLE_TESTING: ON
+#24 6.440 -- Call enable_testing()
+#24 6.441 -- Using CATKIN_TEST_RESULTS_DIR: /catkin_ws/build/test_results
+#24 6.641 -- Forcing gtest/gmock from source, though one was otherwise available.
+#24 6.641 -- Found gtest sources under '/usr/src/googletest': gtests will be built
+#24 6.641 -- Found gmock sources under '/usr/src/googletest': gmock will be built
+#24 6.657 -- Found PythonInterp: /usr/bin/python3 (found version "3.8.10") 
+#24 6.658 -- Found Threads: TRUE  
+#24 6.661 -- Using Python nosetests: /usr/bin/nosetests3
+#24 6.695 -- catkin 0.8.12
+#24 6.695 -- BUILD_SHARED_LIBS is on
+#24 6.781 -- BUILD_SHARED_LIBS is on
+#24 6.781 -- Using CATKIN_WHITELIST_PACKAGES: catkin_simple;cmake_utils;decomp_ros_msgs;quadrotor_msgs
+#24 6.945 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#24 6.945 -- ~~  traversing 4 packages in topological order:
+#24 6.945 -- ~~  - catkin_simple
+#24 6.945 -- ~~  - decomp_ros_msgs
+#24 6.945 -- ~~  - cmake_utils
+#24 6.945 -- ~~  - quadrotor_msgs
+#24 6.945 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#24 6.945 -- +++ processing catkin package: 'catkin_simple'
+#24 6.945 -- ==> add_subdirectory(shiviz_px4_nav/src/utils/catkin_simple)
+#24 7.109 -- +++ processing catkin package: 'decomp_ros_msgs'
+#24 7.109 -- ==> add_subdirectory(shiviz_px4_nav/src/utils/DecompROS/decomp_ros_msgs)
+#24 7.161 -- Using these message generators: gencpp;geneus;genlisp;gennodejs;genpy
+#24 7.274 -- decomp_ros_msgs: 4 messages, 0 services
+#24 7.346 -- +++ processing catkin package: 'cmake_utils'
+#24 7.346 -- ==> add_subdirectory(shiviz_px4_nav/src/utils/cmake_utils)
+#24 7.507 -- +++ processing catkin package: 'quadrotor_msgs'
+#24 7.507 -- ==> add_subdirectory(shiviz_px4_nav/src/utils/quadrotor_msgs)
+#24 7.541 -- Using these message generators: gencpp;geneus;genlisp;gennodejs;genpy
+#24 7.668 -- quadrotor_msgs: 24 messages, 0 services
+#24 7.787 -- Configuring done
+#24 7.817 -- Generating done
+#24 7.823 -- Build files have been written to: /catkin_ws/build
+#24 7.887 -- Using CATKIN_DEVEL_PREFIX: /catkin_ws/devel
+#24 7.887 -- Using CMAKE_PREFIX_PATH: /opt/ros/noetic
+#24 7.887 -- This workspace overlays: /opt/ros/noetic
+#24 7.900 -- Found PythonInterp: /usr/bin/python3 (found suitable version "3.8.10", minimum required is "3") 
+#24 7.900 -- Using PYTHON_EXECUTABLE: /usr/bin/python3
+#24 7.900 -- Using Debian Python package layout
+#24 7.900 -- Using empy: /usr/lib/python3/dist-packages/em.py
+#24 7.975 -- Using CATKIN_ENABLE_TESTING: ON
+#24 7.975 -- Call enable_testing()
+#24 7.975 -- Using CATKIN_TEST_RESULTS_DIR: /catkin_ws/build/test_results
+#24 8.003 -- Forcing gtest/gmock from source, though one was otherwise available.
+#24 8.003 -- Found gtest sources under '/usr/src/googletest': gtests will be built
+#24 8.003 -- Found gmock sources under '/usr/src/googletest': gmock will be built
+#24 8.019 -- Found PythonInterp: /usr/bin/python3 (found version "3.8.10") 
+#24 8.023 -- Using Python nosetests: /usr/bin/nosetests3
+#24 8.057 -- catkin 0.8.12
+#24 8.057 -- BUILD_SHARED_LIBS is on
+#24 8.143 -- BUILD_SHARED_LIBS is on
+#24 8.143 -- Using CATKIN_WHITELIST_PACKAGES: catkin_simple;cmake_utils;decomp_ros_msgs;quadrotor_msgs
+#24 8.308 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#24 8.308 -- ~~  traversing 4 packages in topological order:
+#24 8.308 -- ~~  - catkin_simple
+#24 8.308 -- ~~  - decomp_ros_msgs
+#24 8.308 -- ~~  - cmake_utils
+#24 8.308 -- ~~  - quadrotor_msgs
+#24 8.308 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#24 8.308 -- +++ processing catkin package: 'catkin_simple'
+#24 8.308 -- ==> add_subdirectory(shiviz_px4_nav/src/utils/catkin_simple)
+#24 8.482 -- +++ processing catkin package: 'decomp_ros_msgs'
+#24 8.482 -- ==> add_subdirectory(shiviz_px4_nav/src/utils/DecompROS/decomp_ros_msgs)
+#24 8.533 -- Using these message generators: gencpp;geneus;genlisp;gennodejs;genpy
+#24 8.653 -- decomp_ros_msgs: 4 messages, 0 services
+#24 8.731 -- +++ processing catkin package: 'cmake_utils'
+#24 8.731 -- ==> add_subdirectory(shiviz_px4_nav/src/utils/cmake_utils)
+#24 8.892 -- +++ processing catkin package: 'quadrotor_msgs'
+#24 8.892 -- ==> add_subdirectory(shiviz_px4_nav/src/utils/quadrotor_msgs)
+#24 8.922 -- Using these message generators: gencpp;geneus;genlisp;gennodejs;genpy
+#24 9.051 -- quadrotor_msgs: 24 messages, 0 services
+#24 9.176 -- Configuring done
+#24 9.208 -- Generating done
+#24 9.215 -- Build files have been written to: /catkin_ws/build
+#24 9.235 Scanning dependencies of target _decomp_ros_msgs_generate_messages_check_deps_Polyhedron
+#24 9.235 Scanning dependencies of target _decomp_ros_msgs_generate_messages_check_deps_EllipsoidArray
+#24 9.236 Scanning dependencies of target geometry_msgs_generate_messages_py
+#24 9.236 Scanning dependencies of target geometry_msgs_generate_messages_lisp
+#24 9.236 Scanning dependencies of target geometry_msgs_generate_messages_eus
+#24 9.237 Scanning dependencies of target geometry_msgs_generate_messages_nodejs
+#24 9.237 Scanning dependencies of target _quadrotor_msgs_generate_messages_check_deps_Px4ctrlDebug
+#24 9.237 Scanning dependencies of target _quadrotor_msgs_generate_messages_check_deps_SwarmOdometry
+#24 9.237 Scanning dependencies of target _quadrotor_msgs_generate_messages_check_deps_AuxCommand
+#24 9.237 Scanning dependencies of target _decomp_ros_msgs_generate_messages_check_deps_PolyhedronArray
+#24 9.238 Scanning dependencies of target _decomp_ros_msgs_generate_messages_check_deps_Ellipsoid
+#24 9.238 Scanning dependencies of target _quadrotor_msgs_generate_messages_check_deps_SwarmInfo
+#24 9.238 Scanning dependencies of target _quadrotor_msgs_generate_messages_check_deps_ReplanCheck
+#24 9.238 Scanning dependencies of target _quadrotor_msgs_generate_messages_check_deps_TakeoffLand
+#24 9.239 Scanning dependencies of target _quadrotor_msgs_generate_messages_check_deps_SpatialTemporalTrajectory
+#24 9.239 Scanning dependencies of target _quadrotor_msgs_generate_messages_check_deps_Replan
+#24 9.240 Scanning dependencies of target geometry_msgs_generate_messages_cpp
+#24 9.241 Scanning dependencies of target _quadrotor_msgs_generate_messages_check_deps_TRPYCommand
+#24 9.243 Scanning dependencies of target _quadrotor_msgs_generate_messages_check_deps_SwarmCommand
+#24 9.246 Scanning dependencies of target _quadrotor_msgs_generate_messages_check_deps_Odometry
+#24 9.250 [  0%] Built target geometry_msgs_generate_messages_eus
+#24 9.250 [  0%] Built target geometry_msgs_generate_messages_py
+#24 9.253 [  0%] Built target geometry_msgs_generate_messages_nodejs
+#24 9.270 [  0%] Built target geometry_msgs_generate_messages_lisp
+#24 9.271 [  0%] Built target geometry_msgs_generate_messages_cpp
+#24 9.274 [  0%] Built target _decomp_ros_msgs_generate_messages_check_deps_EllipsoidArray
+#24 9.275 Scanning dependencies of target _quadrotor_msgs_generate_messages_check_deps_StatusData
+#24 9.280 Scanning dependencies of target nav_msgs_generate_messages_cpp
+#24 9.281 [  0%] Built target _decomp_ros_msgs_generate_messages_check_deps_Ellipsoid
+#24 9.283 [  0%] Built target _quadrotor_msgs_generate_messages_check_deps_TRPYCommand
+#24 9.283 Scanning dependencies of target _quadrotor_msgs_generate_messages_check_deps_PositionCommand
+#24 9.283 Scanning dependencies of target _quadrotor_msgs_generate_messages_check_deps_GoalSet
+#24 9.284 [  0%] Built target _quadrotor_msgs_generate_messages_check_deps_Px4ctrlDebug
+#24 9.285 Scanning dependencies of target _quadrotor_msgs_generate_messages_check_deps_OutputData
+#24 9.288 [  0%] Built target _decomp_ros_msgs_generate_messages_check_deps_Polyhedron
+#24 9.288 [  0%] Built target _decomp_ros_msgs_generate_messages_check_deps_PolyhedronArray
+#24 9.289 [  0%] Built target _quadrotor_msgs_generate_messages_check_deps_SwarmOdometry
+#24 9.290 Scanning dependencies of target _quadrotor_msgs_generate_messages_check_deps_Gains
+#24 9.290 [  0%] Built target _quadrotor_msgs_generate_messages_check_deps_SpatialTemporalTrajectory
+#24 9.290 [  0%] Built target _quadrotor_msgs_generate_messages_check_deps_SwarmInfo
+#24 9.290 [  0%] Built target _quadrotor_msgs_generate_messages_check_deps_ReplanCheck
+#24 9.291 [  0%] Built target _quadrotor_msgs_generate_messages_check_deps_TakeoffLand
+#24 9.292 [  0%] Built target _quadrotor_msgs_generate_messages_check_deps_AuxCommand
+#24 9.293 [  0%] Built target _quadrotor_msgs_generate_messages_check_deps_Replan
+#24 9.293 [  0%] Built target nav_msgs_generate_messages_cpp
+#24 9.294 Scanning dependencies of target _quadrotor_msgs_generate_messages_check_deps_Serial
+#24 9.300 Scanning dependencies of target _quadrotor_msgs_generate_messages_check_deps_PPROutputData
+#24 9.300 Scanning dependencies of target _quadrotor_msgs_generate_messages_check_deps_SO3Command
+#24 9.300 Scanning dependencies of target _quadrotor_msgs_generate_messages_check_deps_OptimalTimeAllocator
+#24 9.301 Scanning dependencies of target nav_msgs_generate_messages_nodejs
+#24 9.303 Scanning dependencies of target nav_msgs_generate_messages_lisp
+#24 9.303 Scanning dependencies of target _quadrotor_msgs_generate_messages_check_deps_TrajectoryMatrix
+#24 9.304 Scanning dependencies of target decomp_ros_msgs_generate_messages_py
+#24 9.305 Scanning dependencies of target nav_msgs_generate_messages_py
+#24 9.307 [  0%] Built target _quadrotor_msgs_generate_messages_check_deps_SwarmCommand
+#24 9.307 Scanning dependencies of target _quadrotor_msgs_generate_messages_check_deps_PolynomialTrajectory
+#24 9.307 Scanning dependencies of target nav_msgs_generate_messages_eus
+#24 9.308 Scanning dependencies of target _quadrotor_msgs_generate_messages_check_deps_Bspline
+#24 9.310 make[2]: Warning: File '/catkin_ws/src/shiviz_px4_nav/src/utils/DecompROS/decomp_ros_msgs/msg/Ellipsoid.msg' has modification time 21248 s in the future
+#24 9.312 [  0%] Built target _quadrotor_msgs_generate_messages_check_deps_Odometry
+#24 9.312 Scanning dependencies of target _quadrotor_msgs_generate_messages_check_deps_Corrections
+#24 9.318 [  1%] Built target nav_msgs_generate_messages_lisp
+#24 9.318 [  1%] Built target nav_msgs_generate_messages_nodejs
+#24 9.318 [  1%] Generating Python from MSG decomp_ros_msgs/Ellipsoid
+#24 9.318 [  1%] Generating Python from MSG decomp_ros_msgs/EllipsoidArray
+#24 9.319 [  1%] Built target nav_msgs_generate_messages_py
+#24 9.319 [  1%] Built target nav_msgs_generate_messages_eus
+#24 9.326 Scanning dependencies of target decomp_ros_msgs_generate_messages_nodejs
+#24 9.329 [  1%] Built target _quadrotor_msgs_generate_messages_check_deps_GoalSet
+#24 9.329 [  1%] Built target _quadrotor_msgs_generate_messages_check_deps_StatusData
+#24 9.329 make[2]: Warning: File '/catkin_ws/src/shiviz_px4_nav/src/utils/DecompROS/decomp_ros_msgs/msg/Ellipsoid.msg' has modification time 21248 s in the future
+#24 9.329 Scanning dependencies of target decomp_ros_msgs_generate_messages_eus
+#24 9.329 Scanning dependencies of target decomp_ros_msgs_generate_messages_lisp
+#24 9.330 Scanning dependencies of target decomp_ros_msgs_generate_messages_cpp
+#24 9.331 make[2]: Warning: File '/catkin_ws/src/shiviz_px4_nav/src/utils/DecompROS/decomp_ros_msgs/msg/Ellipsoid.msg' has modification time 21248 s in the future
+#24 9.331 make[2]: Warning: File '/catkin_ws/src/shiviz_px4_nav/src/utils/DecompROS/decomp_ros_msgs/msg/Ellipsoid.msg' has modification time 21248 s in the future
+#24 9.335 [  1%] Built target _quadrotor_msgs_generate_messages_check_deps_PositionCommand
+#24 9.335 [  2%] Built target _quadrotor_msgs_generate_messages_check_deps_OutputData
+#24 9.335 [  2%] Generating Javascript code from decomp_ros_msgs/Ellipsoid.msg
+#24 9.336 [  2%] Generating Javascript code from decomp_ros_msgs/EllipsoidArray.msg
+#24 9.338 [  3%] Generating Javascript code from decomp_ros_msgs/Polyhedron.msg
+#24 9.338 make[2]: Warning: File '/catkin_ws/src/shiviz_px4_nav/src/utils/DecompROS/decomp_ros_msgs/msg/Ellipsoid.msg' has modification time 21248 s in the future
+#24 9.341 [  4%] Generating EusLisp code from decomp_ros_msgs/Ellipsoid.msg
+#24 9.343 [  5%] Generating Lisp code from decomp_ros_msgs/Ellipsoid.msg
+#24 9.343 [  5%] Generating Python from MSG decomp_ros_msgs/Polyhedron
+#24 9.343 [  6%] Generating EusLisp code from decomp_ros_msgs/EllipsoidArray.msg
+#24 9.343 [  6%] Built target _quadrotor_msgs_generate_messages_check_deps_Gains
+#24 9.344 [  6%] Built target _quadrotor_msgs_generate_messages_check_deps_Serial
+#24 9.347 [  6%] Generating C++ code from decomp_ros_msgs/Ellipsoid.msg
+#24 9.349 [  7%] Generating Javascript code from decomp_ros_msgs/PolyhedronArray.msg
+#24 9.350 [  7%] Built target _quadrotor_msgs_generate_messages_check_deps_SO3Command
+#24 9.350 [  7%] Built target _quadrotor_msgs_generate_messages_check_deps_PPROutputData
+#24 9.352 [  8%] Generating EusLisp code from decomp_ros_msgs/Polyhedron.msg
+#24 9.352 [  8%] Generating C++ code from decomp_ros_msgs/EllipsoidArray.msg
+#24 9.352 [  8%] Built target _quadrotor_msgs_generate_messages_check_deps_TrajectoryMatrix
+#24 9.359 [  8%] Generating Python from MSG decomp_ros_msgs/PolyhedronArray
+#24 9.359 [  8%] Built target _quadrotor_msgs_generate_messages_check_deps_OptimalTimeAllocator
+#24 9.362 [  9%] Built target _quadrotor_msgs_generate_messages_check_deps_PolynomialTrajectory
+#24 9.362 [  9%] Generating Lisp code from decomp_ros_msgs/EllipsoidArray.msg
+#24 9.366 [  9%] Built target _quadrotor_msgs_generate_messages_check_deps_Corrections
+#24 9.371 [ 10%] Generating C++ code from decomp_ros_msgs/Polyhedron.msg
+#24 9.377 [ 10%] Generating C++ code from decomp_ros_msgs/PolyhedronArray.msg
+#24 9.383 [ 11%] Generating EusLisp code from decomp_ros_msgs/PolyhedronArray.msg
+#24 9.384 [ 11%] Built target _quadrotor_msgs_generate_messages_check_deps_Bspline
+#24 9.387 [ 12%] Generating Lisp code from decomp_ros_msgs/Polyhedron.msg
+#24 9.387 [ 12%] Generating EusLisp manifest code for decomp_ros_msgs
+#24 9.400 [ 13%] Generating Lisp code from decomp_ros_msgs/PolyhedronArray.msg
+#24 9.405 Scanning dependencies of target quadrotor_msgs_generate_messages_cpp
+#24 9.409 make[2]: Warning: File '/catkin_ws/src/shiviz_px4_nav/src/utils/quadrotor_msgs/msg/AuxCommand.msg' has modification time 21248 s in the future
+#24 9.415 Scanning dependencies of target quadrotor_msgs_generate_messages_lisp
+#24 9.416 make[2]: warning:  Clock skew detected.  Your build may be incomplete.
+#24 9.419 make[2]: Warning: File '/catkin_ws/src/shiviz_px4_nav/src/utils/quadrotor_msgs/msg/AuxCommand.msg' has modification time 21248 s in the future
+#24 9.420 Scanning dependencies of target quadrotor_msgs_generate_messages_nodejs
+#24 9.422 [ 14%] Generating C++ code from quadrotor_msgs/AuxCommand.msg
+#24 9.423 make[2]: Warning: File '/catkin_ws/src/shiviz_px4_nav/src/utils/quadrotor_msgs/msg/AuxCommand.msg' has modification time 21248 s in the future
+#24 9.425 [ 14%] Built target decomp_ros_msgs_generate_messages_nodejs
+#24 9.425 Scanning dependencies of target quadrotor_msgs_generate_messages_py
+#24 9.428 make[2]: Warning: File '/catkin_ws/src/shiviz_px4_nav/src/utils/quadrotor_msgs/msg/AuxCommand.msg' has modification time 21248 s in the future
+#24 9.432 Scanning dependencies of target quadrotor_msgs_generate_messages_eus
+#24 9.433 [ 15%] Generating Javascript code from quadrotor_msgs/AuxCommand.msg
+#24 9.435 make[2]: Warning: File '/catkin_ws/src/shiviz_px4_nav/src/utils/quadrotor_msgs/msg/AuxCommand.msg' has modification time 21248 s in the future
+#24 9.436 [ 16%] Generating Lisp code from quadrotor_msgs/AuxCommand.msg
+#24 9.436 [ 16%] Generating Python from MSG quadrotor_msgs/AuxCommand
+#24 9.443 [ 17%] Generating Python from MSG quadrotor_msgs/Corrections
+#24 9.446 [ 17%] Generating EusLisp code from quadrotor_msgs/AuxCommand.msg
+#24 9.447 [ 18%] Generating Lisp code from quadrotor_msgs/Gains.msg
+#24 9.448 [ 20%] Generating Lisp code from quadrotor_msgs/Corrections.msg
+#24 9.452 [ 21%] Generating C++ code from quadrotor_msgs/Corrections.msg
+#24 9.471 make[2]: warning:  Clock skew detected.  Your build may be incomplete.
+#24 9.472 [ 21%] Generating Lisp code from quadrotor_msgs/GoalSet.msg
+#24 9.481 [ 21%] Built target decomp_ros_msgs_generate_messages_lisp
+#24 9.482 [ 22%] Generating Lisp code from quadrotor_msgs/OutputData.msg
+#24 9.493 [ 22%] Generating Python from MSG quadrotor_msgs/Gains
+#24 9.493 [ 23%] Generating EusLisp code from quadrotor_msgs/Corrections.msg
+#24 9.503 [ 24%] Generating Python from MSG quadrotor_msgs/GoalSet
+#24 9.505 [ 24%] Generating Javascript code from quadrotor_msgs/Corrections.msg
+#24 9.507 make[2]: warning:  Clock skew detected.  Your build may be incomplete.
+#24 9.512 [ 25%] Generating Lisp code from quadrotor_msgs/PositionCommand.msg
+#24 9.514 [ 26%] Generating Javascript code from quadrotor_msgs/Gains.msg
+#24 9.516 [ 26%] Built target decomp_ros_msgs_generate_messages_cpp
+#24 9.524 [ 27%] Generating Python from MSG quadrotor_msgs/OutputData
+#24 9.526 [ 27%] Generating Lisp code from quadrotor_msgs/PPROutputData.msg
+#24 9.546 [ 28%] Generating Python from MSG quadrotor_msgs/PositionCommand
+#24 9.546 [ 28%] Generating EusLisp code from quadrotor_msgs/Gains.msg
+#24 9.551 [ 30%] Generating Javascript code from quadrotor_msgs/GoalSet.msg
+#24 9.551 [ 30%] Generating Lisp code from quadrotor_msgs/Serial.msg
+#24 9.559 [ 30%] Generating C++ code from quadrotor_msgs/Gains.msg
+#24 9.565 [ 30%] Generating Javascript code from quadrotor_msgs/OutputData.msg
+#24 9.576 [ 31%] Generating C++ code from quadrotor_msgs/GoalSet.msg
+#24 9.585 [ 31%] Generating Lisp code from quadrotor_msgs/SO3Command.msg
+#24 9.593 [ 32%] Generating Javascript code from quadrotor_msgs/PositionCommand.msg
+#24 9.598 [ 33%] Generating Python msg __init__.py for decomp_ros_msgs
+#24 9.600 [ 33%] Generating EusLisp code from quadrotor_msgs/GoalSet.msg
+#24 9.614 [ 35%] Generating Lisp code from quadrotor_msgs/StatusData.msg
+#24 9.614 [ 35%] Generating C++ code from quadrotor_msgs/OutputData.msg
+#24 9.618 [ 36%] Generating Javascript code from quadrotor_msgs/PPROutputData.msg
+#24 9.619 [ 37%] Generating EusLisp code from quadrotor_msgs/OutputData.msg
+#24 9.627 [ 37%] Generating C++ code from quadrotor_msgs/PositionCommand.msg
+#24 9.664 [ 38%] Generating Python from MSG quadrotor_msgs/PPROutputData
+#24 9.677 [ 41%] Generating Javascript code from quadrotor_msgs/StatusData.msg
+#24 9.677 [ 41%] Generating Javascript code from quadrotor_msgs/SO3Command.msg
+#24 9.679 [ 41%] Generating Javascript code from quadrotor_msgs/Serial.msg
+#24 9.684 [ 42%] Generating Python from MSG quadrotor_msgs/Serial
+#24 9.688 [ 42%] Generating Python from MSG quadrotor_msgs/SO3Command
+#24 9.689 [ 43%] Generating C++ code from quadrotor_msgs/PPROutputData.msg
+#24 9.696 [ 43%] Generating Javascript code from quadrotor_msgs/TRPYCommand.msg
+#24 9.722 [ 44%] Generating Lisp code from quadrotor_msgs/TRPYCommand.msg
+#24 9.723 [ 45%] Generating EusLisp code from quadrotor_msgs/PositionCommand.msg
+#24 9.727 [ 45%] Generating C++ code from quadrotor_msgs/Serial.msg
+#24 9.727 [ 45%] Generating EusLisp code from quadrotor_msgs/PPROutputData.msg
+#24 9.733 [ 46%] Generating Python from MSG quadrotor_msgs/StatusData
+#24 9.742 [ 47%] Generating EusLisp code from quadrotor_msgs/Serial.msg
+#24 9.759 [ 48%] Generating C++ code from quadrotor_msgs/SO3Command.msg
+#24 9.762 [ 48%] Generating Javascript code from quadrotor_msgs/PolynomialTrajectory.msg
+#24 9.764 [ 49%] Generating Javascript code from quadrotor_msgs/Odometry.msg
+#24 9.766 [ 50%] Generating Python from MSG quadrotor_msgs/TRPYCommand
+#24 9.775 [ 51%] Generating Javascript code from quadrotor_msgs/OptimalTimeAllocator.msg
+#24 9.779 [ 51%] Generating Python from MSG quadrotor_msgs/Odometry
+#24 9.781 [ 52%] Generating C++ code from quadrotor_msgs/StatusData.msg
+#24 9.823 [ 53%] Generating C++ code from quadrotor_msgs/TRPYCommand.msg
+#24 9.823 [ 53%] Generating Javascript code from quadrotor_msgs/TrajectoryMatrix.msg
+#24 9.830 [ 53%] Generating Javascript code from quadrotor_msgs/ReplanCheck.msg
+#24 9.832 [ 54%] Generating Javascript code from quadrotor_msgs/SpatialTemporalTrajectory.msg
+#24 9.845 make[2]: warning:  Clock skew detected.  Your build may be incomplete.
+#24 9.853 [ 54%] Generating EusLisp code from quadrotor_msgs/SO3Command.msg
+#24 9.853 make[2]: warning:  Clock skew detected.  Your build may be incomplete.
+#24 9.859 [ 54%] Generating Lisp code from quadrotor_msgs/Odometry.msg
+#24 9.861 [ 54%] Built target decomp_ros_msgs_generate_messages_eus
+#24 9.862 [ 54%] Built target decomp_ros_msgs_generate_messages_py
+#24 9.869 [ 55%] Generating C++ code from quadrotor_msgs/PolynomialTrajectory.msg
+#24 9.870 [ 56%] Generating C++ code from quadrotor_msgs/Odometry.msg
+#24 9.872 [ 56%] Generating C++ code from quadrotor_msgs/OptimalTimeAllocator.msg
+#24 9.876 Scanning dependencies of target decomp_ros_msgs_generate_messages
+#24 9.877 [ 57%] Generating Javascript code from quadrotor_msgs/Bspline.msg
+#24 9.885 [ 58%] Generating EusLisp code from quadrotor_msgs/StatusData.msg
+#24 9.890 [ 58%] Built target decomp_ros_msgs_generate_messages
+#24 9.896 [ 58%] Generating Javascript code from quadrotor_msgs/SwarmCommand.msg
+#24 9.898 [ 60%] Generating Javascript code from quadrotor_msgs/Replan.msg
+#24 9.901 [ 61%] Generating C++ code from quadrotor_msgs/TrajectoryMatrix.msg
+#24 9.904 [ 61%] Generating C++ code from quadrotor_msgs/SpatialTemporalTrajectory.msg
+#24 9.905 [ 62%] Generating EusLisp code from quadrotor_msgs/TRPYCommand.msg
+#24 9.909 [ 63%] Generating Lisp code from quadrotor_msgs/PolynomialTrajectory.msg
+#24 9.910 [ 64%] Generating C++ code from quadrotor_msgs/ReplanCheck.msg
+#24 9.930 [ 65%] Generating C++ code from quadrotor_msgs/Bspline.msg
+#24 9.936 [ 65%] Generating C++ code from quadrotor_msgs/SwarmCommand.msg
+#24 9.936 [ 66%] Generating Python from MSG quadrotor_msgs/PolynomialTrajectory
+#24 9.960 [ 67%] Generating C++ code from quadrotor_msgs/Replan.msg
+#24 9.962 [ 68%] Generating Javascript code from quadrotor_msgs/SwarmOdometry.msg
+#24 9.973 [ 68%] Generating Lisp code from quadrotor_msgs/TrajectoryMatrix.msg
+#24 9.974 [ 69%] Generating Lisp code from quadrotor_msgs/OptimalTimeAllocator.msg
+#24 9.985 [ 69%] Generating Python from MSG quadrotor_msgs/OptimalTimeAllocator
+#24 9.991 [ 70%] Generating Python from MSG quadrotor_msgs/TrajectoryMatrix
+#24 9.997 [ 70%] Generating EusLisp code from quadrotor_msgs/Odometry.msg
+#24 10.01 [ 71%] Generating C++ code from quadrotor_msgs/SwarmOdometry.msg
+#24 10.02 [ 72%] Generating C++ code from quadrotor_msgs/SwarmInfo.msg
+#24 10.02 [ 72%] Generating Lisp code from quadrotor_msgs/ReplanCheck.msg
+#24 10.02 [ 74%] Generating C++ code from quadrotor_msgs/Px4ctrlDebug.msg
+#24 10.02 [ 74%] Generating EusLisp code from quadrotor_msgs/PolynomialTrajectory.msg
+#24 10.03 [ 75%] Generating Javascript code from quadrotor_msgs/SwarmInfo.msg
+#24 10.03 [ 75%] Generating Lisp code from quadrotor_msgs/SpatialTemporalTrajectory.msg
+#24 10.03 [ 76%] Generating Javascript code from quadrotor_msgs/Px4ctrlDebug.msg
+#24 10.03 [ 76%] Generating Javascript code from quadrotor_msgs/TakeoffLand.msg
+#24 10.04 [ 77%] Generating C++ code from quadrotor_msgs/TakeoffLand.msg
+#24 10.04 [ 77%] Generating Lisp code from quadrotor_msgs/Bspline.msg
+#24 10.04 [ 78%] Generating Lisp code from quadrotor_msgs/SwarmCommand.msg
+#24 10.05 [ 80%] Generating Python from MSG quadrotor_msgs/ReplanCheck
+#24 10.06 [ 81%] Generating Lisp code from quadrotor_msgs/Replan.msg
+#24 10.07 [ 81%] Generating Lisp code from quadrotor_msgs/SwarmOdometry.msg
+#24 10.08 [ 82%] Generating Lisp code from quadrotor_msgs/SwarmInfo.msg
+#24 10.09 [ 82%] Generating Lisp code from quadrotor_msgs/Px4ctrlDebug.msg
+#24 10.09 [ 83%] Generating Lisp code from quadrotor_msgs/TakeoffLand.msg
+#24 10.10 [ 83%] Generating Python from MSG quadrotor_msgs/SpatialTemporalTrajectory
+#24 10.10 [ 84%] Generating Python from MSG quadrotor_msgs/SwarmCommand
+#24 10.10 [ 85%] Generating EusLisp code from quadrotor_msgs/OptimalTimeAllocator.msg
+#24 10.10 [ 85%] Generating EusLisp code from quadrotor_msgs/TrajectoryMatrix.msg
+#24 10.11 make[2]: warning:  Clock skew detected.  Your build may be incomplete.
+#24 10.12 [ 86%] Generating Python from MSG quadrotor_msgs/Bspline
+#24 10.13 [ 86%] Generating Python from MSG quadrotor_msgs/Replan
+#24 10.14 [ 87%] Generating Python from MSG quadrotor_msgs/SwarmOdometry
+#24 10.14 [ 88%] Generating EusLisp code from quadrotor_msgs/ReplanCheck.msg
+#24 10.14 [ 89%] Generating Python from MSG quadrotor_msgs/SwarmInfo
+#24 10.15 [ 89%] Built target quadrotor_msgs_generate_messages_nodejs
+#24 10.15 make[2]: warning:  Clock skew detected.  Your build may be incomplete.
+#24 10.15 [ 89%] Generating Python from MSG quadrotor_msgs/Px4ctrlDebug
+#24 10.15 [ 91%] Generating EusLisp code from quadrotor_msgs/SpatialTemporalTrajectory.msg
+#24 10.15 [ 91%] Generating Python from MSG quadrotor_msgs/TakeoffLand
+#24 10.16 [ 91%] Generating EusLisp code from quadrotor_msgs/Bspline.msg
+#24 10.17 [ 91%] Built target quadrotor_msgs_generate_messages_lisp
+#24 10.18 [ 92%] Generating EusLisp code from quadrotor_msgs/SwarmCommand.msg
+#24 10.18 [ 93%] Generating EusLisp code from quadrotor_msgs/Replan.msg
+#24 10.19 [ 93%] Generating EusLisp code from quadrotor_msgs/SwarmOdometry.msg
+#24 10.19 make[2]: warning:  Clock skew detected.  Your build may be incomplete.
+#24 10.20 [ 94%] Generating EusLisp code from quadrotor_msgs/SwarmInfo.msg
+#24 10.20 [ 94%] Built target quadrotor_msgs_generate_messages_cpp
+#24 10.21 [ 94%] Generating EusLisp code from quadrotor_msgs/Px4ctrlDebug.msg
+#24 10.23 [ 95%] Generating EusLisp code from quadrotor_msgs/TakeoffLand.msg
+#24 10.23 [ 96%] Generating EusLisp manifest code for quadrotor_msgs
+#24 10.24 Scanning dependencies of target decode_msgs
+#24 10.24 make[2]: Warning: File '/catkin_ws/src/shiviz_px4_nav/src/utils/quadrotor_msgs/src/decode_msgs.cpp' has modification time 21247 s in the future
+#24 10.30 [ 96%] Building CXX object shiviz_px4_nav/src/utils/quadrotor_msgs/CMakeFiles/decode_msgs.dir/src/decode_msgs.cpp.o
+#24 10.30 Scanning dependencies of target encode_msgs
+#24 10.31 make[2]: Warning: File '/catkin_ws/src/shiviz_px4_nav/src/utils/quadrotor_msgs/src/encode_msgs.cpp' has modification time 21247 s in the future
+#24 10.32 [ 97%] Building CXX object shiviz_px4_nav/src/utils/quadrotor_msgs/CMakeFiles/encode_msgs.dir/src/encode_msgs.cpp.o
+#24 10.37 [ 98%] Generating Python msg __init__.py for quadrotor_msgs
+#24 10.48 make[2]: warning:  Clock skew detected.  Your build may be incomplete.
+#24 10.48 [ 98%] Built target quadrotor_msgs_generate_messages_eus
+#24 10.49 make[2]: warning:  Clock skew detected.  Your build may be incomplete.
+#24 10.50 [ 98%] Built target quadrotor_msgs_generate_messages_py
+#24 10.50 Scanning dependencies of target quadrotor_msgs_generate_messages
+#24 10.51 [ 98%] Built target quadrotor_msgs_generate_messages
+#24 10.81 [ 98%] Linking CXX shared library /catkin_ws/devel/lib/libencode_msgs.so
+#24 10.84 make[2]: warning:  Clock skew detected.  Your build may be incomplete.
+#24 10.85 [ 98%] Built target encode_msgs
+#24 11.10 [100%] Linking CXX shared library /catkin_ws/devel/lib/libdecode_msgs.so
+#24 11.14 make[2]: warning:  Clock skew detected.  Your build may be incomplete.
+#24 11.15 [100%] Built target decode_msgs
+#24 11.15 Base path: /catkin_ws
+#24 11.15 Source space: /catkin_ws/src
+#24 11.15 Build space: /catkin_ws/build
+#24 11.15 Devel space: /catkin_ws/devel
+#24 11.15 Install space: /catkin_ws/install
+#24 11.15 Creating symlink "/catkin_ws/src/CMakeLists.txt" pointing to "/opt/ros/noetic/share/catkin/cmake/toplevel.cmake"
+#24 11.15 Whitelisted packages: catkin_simple, cmake_utils, decomp_ros_msgs, quadrotor_msgs
+#24 11.15 ####
+#24 11.15 #### Running command: "cmake /catkin_ws/src -DCMAKE_BUILD_TYPE=Release -DCATKIN_DEVEL_PREFIX=/catkin_ws/devel -DCMAKE_INSTALL_PREFIX=/catkin_ws/install -DCATKIN_WHITELIST_PACKAGES=catkin_simple;cmake_utils;decomp_ros_msgs;quadrotor_msgs -G Unix Makefiles" in "/catkin_ws/build"
+#24 11.15 ####
+#24 11.15 ####
+#24 11.15 #### Running command: "make -j20 -l20" in "/catkin_ws/build"
+#24 11.15 ####
+#24 11.16 Building utility packages...
+#24 11.26 -- Using CATKIN_DEVEL_PREFIX: /catkin_ws/devel
+#24 11.26 -- Using CMAKE_PREFIX_PATH: /opt/ros/noetic
+#24 11.26 -- This workspace overlays: /opt/ros/noetic
+#24 11.27 -- Found PythonInterp: /usr/bin/python3 (found suitable version "3.8.10", minimum required is "3") 
+#24 11.27 -- Using PYTHON_EXECUTABLE: /usr/bin/python3
+#24 11.27 -- Using Debian Python package layout
+#24 11.27 -- Using empy: /usr/lib/python3/dist-packages/em.py
+#24 11.35 -- Using CATKIN_ENABLE_TESTING: ON
+#24 11.35 -- Call enable_testing()
+#24 11.35 -- Using CATKIN_TEST_RESULTS_DIR: /catkin_ws/build/test_results
+#24 11.38 -- Forcing gtest/gmock from source, though one was otherwise available.
+#24 11.38 -- Found gtest sources under '/usr/src/googletest': gtests will be built
+#24 11.38 -- Found gmock sources under '/usr/src/googletest': gmock will be built
+#24 11.39 -- Found PythonInterp: /usr/bin/python3 (found version "3.8.10") 
+#24 11.40 -- Using Python nosetests: /usr/bin/nosetests3
+#24 11.43 -- catkin 0.8.12
+#24 11.43 -- BUILD_SHARED_LIBS is on
+#24 11.51 -- BUILD_SHARED_LIBS is on
+#24 11.51 -- Using CATKIN_WHITELIST_PACKAGES: catkin_simple;cmake_utils;pose_utils;uav_utils
+#24 11.67 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#24 11.67 -- ~~  traversing 4 packages in topological order:
+#24 11.67 -- ~~  - catkin_simple
+#24 11.67 -- ~~  - cmake_utils
+#24 11.67 -- ~~  - pose_utils
+#24 11.67 -- ~~  - uav_utils
+#24 11.67 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#24 11.67 -- +++ processing catkin package: 'catkin_simple'
+#24 11.67 -- ==> add_subdirectory(shiviz_px4_nav/src/utils/catkin_simple)
+#24 11.84 -- +++ processing catkin package: 'cmake_utils'
+#24 11.84 -- ==> add_subdirectory(shiviz_px4_nav/src/utils/cmake_utils)
+#24 12.02 -- +++ processing catkin package: 'pose_utils'
+#24 12.02 -- ==> add_subdirectory(shiviz_px4_nav/src/utils/pose_utils)
+#24 12.18 -- Found Armadillo: /usr/lib/libarmadillo.so (found version "9.800.4") 
+#24 12.18 -- +++ processing catkin package: 'uav_utils'
+#24 12.18 -- ==> add_subdirectory(shiviz_px4_nav/src/utils/uav_utils)
+#24 12.19 -- Performing Test COMPILER_SUPPORTS_CXX11
+#24 12.23 -- Performing Test COMPILER_SUPPORTS_CXX11 - Success
+#24 12.24 -- Performing Test COMPILER_SUPPORTS_CXX0X
+#24 12.29 -- Performing Test COMPILER_SUPPORTS_CXX0X - Success
+#24 12.35 -- Found Eigen: /usr/include/eigen3 (found version "3.3.7") 
+#24 12.46 -- Configuring done
+#24 12.47 -- Generating done
+#24 12.47 -- Build files have been written to: /catkin_ws/build
+#24 12.54 -- Using CATKIN_DEVEL_PREFIX: /catkin_ws/devel
+#24 12.54 -- Using CMAKE_PREFIX_PATH: /opt/ros/noetic
+#24 12.54 -- This workspace overlays: /opt/ros/noetic
+#24 12.55 -- Found PythonInterp: /usr/bin/python3 (found suitable version "3.8.10", minimum required is "3") 
+#24 12.55 -- Using PYTHON_EXECUTABLE: /usr/bin/python3
+#24 12.55 -- Using Debian Python package layout
+#24 12.55 -- Using empy: /usr/lib/python3/dist-packages/em.py
+#24 12.62 -- Using CATKIN_ENABLE_TESTING: ON
+#24 12.62 -- Call enable_testing()
+#24 12.62 -- Using CATKIN_TEST_RESULTS_DIR: /catkin_ws/build/test_results
+#24 12.65 -- Forcing gtest/gmock from source, though one was otherwise available.
+#24 12.65 -- Found gtest sources under '/usr/src/googletest': gtests will be built
+#24 12.65 -- Found gmock sources under '/usr/src/googletest': gmock will be built
+#24 12.66 -- Found PythonInterp: /usr/bin/python3 (found version "3.8.10") 
+#24 12.67 -- Using Python nosetests: /usr/bin/nosetests3
+#24 12.70 -- catkin 0.8.12
+#24 12.70 -- BUILD_SHARED_LIBS is on
+#24 12.78 -- BUILD_SHARED_LIBS is on
+#24 12.78 -- Using CATKIN_WHITELIST_PACKAGES: catkin_simple;cmake_utils;pose_utils;uav_utils
+#24 12.95 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#24 12.95 -- ~~  traversing 4 packages in topological order:
+#24 12.95 -- ~~  - catkin_simple
+#24 12.95 -- ~~  - cmake_utils
+#24 12.95 -- ~~  - pose_utils
+#24 12.95 -- ~~  - uav_utils
+#24 12.95 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#24 12.95 -- +++ processing catkin package: 'catkin_simple'
+#24 12.95 -- ==> add_subdirectory(shiviz_px4_nav/src/utils/catkin_simple)
+#24 13.11 -- +++ processing catkin package: 'cmake_utils'
+#24 13.11 -- ==> add_subdirectory(shiviz_px4_nav/src/utils/cmake_utils)
+#24 13.28 -- +++ processing catkin package: 'pose_utils'
+#24 13.28 -- ==> add_subdirectory(shiviz_px4_nav/src/utils/pose_utils)
+#24 13.44 -- +++ processing catkin package: 'uav_utils'
+#24 13.44 -- ==> add_subdirectory(shiviz_px4_nav/src/utils/uav_utils)
+#24 13.60 -- Configuring done
+#24 13.62 -- Generating done
+#24 13.62 -- Build files have been written to: /catkin_ws/build
+#24 13.63 Scanning dependencies of target pose_utils
+#24 13.63 make[2]: Warning: File '/catkin_ws/src/shiviz_px4_nav/src/utils/pose_utils/src/pose_utils.cpp' has modification time 21244 s in the future
+#24 13.64 [ 50%] Building CXX object shiviz_px4_nav/src/utils/pose_utils/CMakeFiles/pose_utils.dir/src/pose_utils.cpp.o
+#24 15.89 [100%] Linking CXX shared library /catkin_ws/devel/lib/libpose_utils.so
+#24 15.93 make[2]: warning:  Clock skew detected.  Your build may be incomplete.
+#24 15.93 [100%] Built target pose_utils
+#24 15.94 Base path: /catkin_ws
+#24 15.94 Source space: /catkin_ws/src
+#24 15.94 Build space: /catkin_ws/build
+#24 15.94 Devel space: /catkin_ws/devel
+#24 15.94 Install space: /catkin_ws/install
+#24 15.94 Whitelisted packages: catkin_simple, cmake_utils, pose_utils, uav_utils
+#24 15.94 ####
+#24 15.94 #### Running command: "cmake /catkin_ws/src -DCMAKE_BUILD_TYPE=Release -DCATKIN_DEVEL_PREFIX=/catkin_ws/devel -DCMAKE_INSTALL_PREFIX=/catkin_ws/install -DCATKIN_WHITELIST_PACKAGES=catkin_simple;cmake_utils;pose_utils;uav_utils -G Unix Makefiles" in "/catkin_ws/build"
+#24 15.94 ####
+#24 15.94 ####
+#24 15.94 #### Running command: "make -j20 -l20" in "/catkin_ws/build"
+#24 15.94 ####
+#24 15.95 Building main navigation packages...
+#24 16.05 -- Using CATKIN_DEVEL_PREFIX: /catkin_ws/devel
+#24 16.05 -- Using CMAKE_PREFIX_PATH: /opt/ros/noetic
+#24 16.05 -- This workspace overlays: /opt/ros/noetic
+#24 16.06 -- Found PythonInterp: /usr/bin/python3 (found suitable version "3.8.10", minimum required is "3") 
+#24 16.06 -- Using PYTHON_EXECUTABLE: /usr/bin/python3
+#24 16.06 -- Using Debian Python package layout
+#24 16.06 -- Using empy: /usr/lib/python3/dist-packages/em.py
+#24 16.13 -- Using CATKIN_ENABLE_TESTING: ON
+#24 16.13 -- Call enable_testing()
+#24 16.13 -- Using CATKIN_TEST_RESULTS_DIR: /catkin_ws/build/test_results
+#24 16.16 -- Forcing gtest/gmock from source, though one was otherwise available.
+#24 16.16 -- Found gtest sources under '/usr/src/googletest': gtests will be built
+#24 16.16 -- Found gmock sources under '/usr/src/googletest': gmock will be built
+#24 16.18 -- Found PythonInterp: /usr/bin/python3 (found version "3.8.10") 
+#24 16.18 -- Using Python nosetests: /usr/bin/nosetests3
+#24 16.22 -- catkin 0.8.12
+#24 16.22 -- BUILD_SHARED_LIBS is on
+#24 16.31 -- BUILD_SHARED_LIBS is on
+#24 16.31 -- Using CATKIN_WHITELIST_PACKAGES: px4_offboard
+#24 16.47 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#24 16.47 -- ~~  traversing 1 packages in topological order:
+#24 16.47 -- ~~  - px4_offboard
+#24 16.47 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#24 16.47 -- +++ processing catkin package: 'px4_offboard'
+#24 16.47 -- ==> add_subdirectory(shiviz_px4_nav/src/px4_offboard_node)
+#24 16.50 -- Using these message generators: gencpp;geneus;genlisp;gennodejs;genpy
+#24 16.66 -- Configuring done
+#24 16.69 -- Generating done
+#24 16.69 -- Build files have been written to: /catkin_ws/build
+#24 16.73 Scanning dependencies of target yaml-cpp
+#24 16.74 [  2%] Building CXX object shiviz_px4_nav/src/px4_offboard_node/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/contrib/graphbuilderadapter.cpp.o
+#24 16.74 [  4%] Building CXX object shiviz_px4_nav/src/px4_offboard_node/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/contrib/graphbuilder.cpp.o
+#24 16.74 [  7%] Building CXX object shiviz_px4_nav/src/px4_offboard_node/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/binary.cpp.o
+#24 16.74 [  9%] Building CXX object shiviz_px4_nav/src/px4_offboard_node/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/convert.cpp.o
+#24 16.74 [ 14%] Building CXX object shiviz_px4_nav/src/px4_offboard_node/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/directives.cpp.o
+#24 16.74 [ 14%] Building CXX object shiviz_px4_nav/src/px4_offboard_node/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/emit.cpp.o
+#24 16.74 [ 16%] Building CXX object shiviz_px4_nav/src/px4_offboard_node/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/exp.cpp.o
+#24 16.74 [ 21%] Building CXX object shiviz_px4_nav/src/px4_offboard_node/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/exceptions.cpp.o
+#24 16.74 [ 21%] Building CXX object shiviz_px4_nav/src/px4_offboard_node/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/depthguard.cpp.o
+#24 16.74 [ 23%] Building CXX object shiviz_px4_nav/src/px4_offboard_node/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/fptostring.cpp.o
+#24 16.74 [ 26%] Building CXX object shiviz_px4_nav/src/px4_offboard_node/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/emitter.cpp.o
+#24 16.74 [ 28%] Building CXX object shiviz_px4_nav/src/px4_offboard_node/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/emitfromevents.cpp.o
+#24 16.74 [ 30%] Building CXX object shiviz_px4_nav/src/px4_offboard_node/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/null.cpp.o
+#24 16.74 [ 33%] Building CXX object shiviz_px4_nav/src/px4_offboard_node/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/emitterstate.cpp.o
+#24 16.74 [ 38%] Building CXX object shiviz_px4_nav/src/px4_offboard_node/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/memory.cpp.o
+#24 16.74 [ 38%] Building CXX object shiviz_px4_nav/src/px4_offboard_node/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/emitterutils.cpp.o
+#24 16.74 [ 40%] Building CXX object shiviz_px4_nav/src/px4_offboard_node/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/nodeevents.cpp.o
+#24 16.75 [ 42%] Building CXX object shiviz_px4_nav/src/px4_offboard_node/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/node.cpp.o
+#24 16.75 [ 45%] Building CXX object shiviz_px4_nav/src/px4_offboard_node/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/nodebuilder.cpp.o
+#24 16.75 [ 47%] Building CXX object shiviz_px4_nav/src/px4_offboard_node/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/node_data.cpp.o
+#24 16.80 [ 50%] Building CXX object shiviz_px4_nav/src/px4_offboard_node/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/ostream_wrapper.cpp.o
+#24 17.10 [ 52%] Building CXX object shiviz_px4_nav/src/px4_offboard_node/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/parse.cpp.o
+#24 17.19 [ 54%] Building CXX object shiviz_px4_nav/src/px4_offboard_node/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/parser.cpp.o
+#24 17.20 [ 57%] Building CXX object shiviz_px4_nav/src/px4_offboard_node/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/regex_yaml.cpp.o
+#24 17.23 [ 59%] Building CXX object shiviz_px4_nav/src/px4_offboard_node/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/scanner.cpp.o
+#24 17.23 [ 61%] Building CXX object shiviz_px4_nav/src/px4_offboard_node/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/scanscalar.cpp.o
+#24 17.25 [ 64%] Building CXX object shiviz_px4_nav/src/px4_offboard_node/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/scantag.cpp.o
+#24 17.29 [ 66%] Building CXX object shiviz_px4_nav/src/px4_offboard_node/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/scantoken.cpp.o
+#24 17.44 [ 69%] Building CXX object shiviz_px4_nav/src/px4_offboard_node/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/simplekey.cpp.o
+#24 17.46 [ 71%] Building CXX object shiviz_px4_nav/src/px4_offboard_node/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/singledocparser.cpp.o
+#24 17.48 [ 73%] Building CXX object shiviz_px4_nav/src/px4_offboard_node/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/stream.cpp.o
+#24 17.57 [ 76%] Building CXX object shiviz_px4_nav/src/px4_offboard_node/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/tag.cpp.o
+#24 18.86 [ 78%] Linking CXX shared library /catkin_ws/devel/lib/libyaml-cpp.so
+#24 18.93 [ 78%] Built target yaml-cpp
+#24 18.94 Scanning dependencies of target yaml-cpp-read
+#24 18.94 Scanning dependencies of target yaml-cpp-parse
+#24 18.94 Scanning dependencies of target yaml-cpp-sandbox
+#24 18.95 [ 85%] Building CXX object shiviz_px4_nav/src/px4_offboard_node/yaml-cpp/util/CMakeFiles/yaml-cpp-parse.dir/parse.cpp.o
+#24 18.95 [ 85%] Building CXX object shiviz_px4_nav/src/px4_offboard_node/yaml-cpp/util/CMakeFiles/yaml-cpp-sandbox.dir/sandbox.cpp.o
+#24 18.95 [ 85%] Building CXX object shiviz_px4_nav/src/px4_offboard_node/yaml-cpp/util/CMakeFiles/yaml-cpp-read.dir/read.cpp.o
+#24 18.96 Scanning dependencies of target px4_offboard_node
+#24 18.96 make[2]: Warning: File '/catkin_ws/src/shiviz_px4_nav/src/px4_offboard_node/src/main.cpp' has modification time 21121 s in the future
+#24 18.97 [ 90%] Building CXX object shiviz_px4_nav/src/px4_offboard_node/CMakeFiles/px4_offboard_node.dir/src/main.cpp.o
+#24 18.97 [ 90%] Building CXX object shiviz_px4_nav/src/px4_offboard_node/CMakeFiles/px4_offboard_node.dir/src/waypoint_navigator.cpp.o
+#24 19.58 [ 92%] Linking CXX executable /catkin_ws/devel/lib/px4_offboard/parse
+#24 19.63 [ 92%] Built target yaml-cpp-parse
+#24 19.63 [ 95%] Linking CXX executable /catkin_ws/devel/lib/px4_offboard/read
+#24 19.65 [ 97%] Linking CXX executable /catkin_ws/devel/lib/px4_offboard/sandbox
+#24 19.69 [ 97%] Built target yaml-cpp-read
+#24 19.71 [ 97%] Built target yaml-cpp-sandbox
+#24 24.42 [100%] Linking CXX executable /catkin_ws/devel/lib/px4_offboard/px4_offboard_node
+#24 24.52 make[2]: warning:  Clock skew detected.  Your build may be incomplete.
+#24 24.52 [100%] Built target px4_offboard_node
+#24 24.53 Base path: /catkin_ws
+#24 24.53 Source space: /catkin_ws/src
+#24 24.53 Build space: /catkin_ws/build
+#24 24.53 Devel space: /catkin_ws/devel
+#24 24.53 Install space: /catkin_ws/install
+#24 24.53 Whitelisted packages: px4_offboard
+#24 24.53 ####
+#24 24.53 #### Running command: "cmake /catkin_ws/src -DCMAKE_BUILD_TYPE=Release -DCATKIN_DEVEL_PREFIX=/catkin_ws/devel -DCMAKE_INSTALL_PREFIX=/catkin_ws/install -DCATKIN_WHITELIST_PACKAGES=px4_offboard -G Unix Makefiles" in "/catkin_ws/build"
+#24 24.53 ####
+#24 24.53 ####
+#24 24.53 #### Running command: "make -j20 -l20" in "/catkin_ws/build"
+#24 24.53 ####
+#24 24.53 Building px4ctrl package...
+#24 24.64 -- Using CATKIN_DEVEL_PREFIX: /catkin_ws/devel
+#24 24.64 -- Using CMAKE_PREFIX_PATH: /opt/ros/noetic
+#24 24.64 -- This workspace overlays: /opt/ros/noetic
+#24 24.66 -- Found PythonInterp: /usr/bin/python3 (found suitable version "3.8.10", minimum required is "3") 
+#24 24.66 -- Using PYTHON_EXECUTABLE: /usr/bin/python3
+#24 24.66 -- Using Debian Python package layout
+#24 24.66 -- Using empy: /usr/lib/python3/dist-packages/em.py
+#24 24.74 -- Using CATKIN_ENABLE_TESTING: ON
+#24 24.74 -- Call enable_testing()
+#24 24.74 -- Using CATKIN_TEST_RESULTS_DIR: /catkin_ws/build/test_results
+#24 24.77 -- Forcing gtest/gmock from source, though one was otherwise available.
+#24 24.77 -- Found gtest sources under '/usr/src/googletest': gtests will be built
+#24 24.77 -- Found gmock sources under '/usr/src/googletest': gmock will be built
+#24 24.78 -- Found PythonInterp: /usr/bin/python3 (found version "3.8.10") 
+#24 24.79 -- Using Python nosetests: /usr/bin/nosetests3
+#24 24.82 -- catkin 0.8.12
+#24 24.82 -- BUILD_SHARED_LIBS is on
+#24 24.92 -- BUILD_SHARED_LIBS is on
+#24 24.92 -- Using CATKIN_WHITELIST_PACKAGES: cmake_utils;px4ctrl;quadrotor_msgs;uav_utils
+#24 25.09 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#24 25.09 -- ~~  traversing 4 packages in topological order:
+#24 25.09 -- ~~  - cmake_utils
+#24 25.09 -- ~~  - quadrotor_msgs
+#24 25.09 -- ~~  - uav_utils
+#24 25.09 -- ~~  - px4ctrl
+#24 25.09 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#24 25.09 -- +++ processing catkin package: 'cmake_utils'
+#24 25.09 -- ==> add_subdirectory(shiviz_px4_nav/src/utils/cmake_utils)
+#24 25.26 -- +++ processing catkin package: 'quadrotor_msgs'
+#24 25.26 -- ==> add_subdirectory(shiviz_px4_nav/src/utils/quadrotor_msgs)
+#24 25.29 -- Using these message generators: gencpp;geneus;genlisp;gennodejs;genpy
+#24 25.43 -- quadrotor_msgs: 24 messages, 0 services
+#24 25.56 -- +++ processing catkin package: 'uav_utils'
+#24 25.56 -- ==> add_subdirectory(shiviz_px4_nav/src/utils/uav_utils)
+#24 25.73 -- +++ processing catkin package: 'px4ctrl'
+#24 25.73 -- ==> add_subdirectory(shiviz_px4_nav/src/px4ctrl)
+#24 25.80 -- Using these message generators: gencpp;geneus;genlisp;gennodejs;genpy
+#24 26.00 -- Installing devel-space wrapper /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/thrust_calibrate_scrips/thrust_calibrate.py to /catkin_ws/devel/lib/px4ctrl
+#24 26.00 -- Configuring done
+#24 26.01 CMake Warning (dev) at shiviz_px4_nav/src/px4ctrl/CMakeLists.txt:41 (add_dependencies):
+#24 26.01   Policy CMP0046 is not set: Error on non-existent dependency in
+#24 26.01   add_dependencies.  Run "cmake --help-policy CMP0046" for policy details.
+#24 26.01   Use the cmake_policy command to set the policy and suppress this warning.
+#24 26.01 
+#24 26.01   The dependency target "quadrotor_msgs" of target "px4ctrl_node" does not
+#24 26.01   exist.
+#24 26.01 This warning is for project developers.  Use -Wno-dev to suppress it.
+#24 26.01 
+#24 26.04 -- Generating done
+#24 26.05 -- Build files have been written to: /catkin_ws/build
+#24 26.12 -- Using CATKIN_DEVEL_PREFIX: /catkin_ws/devel
+#24 26.12 -- Using CMAKE_PREFIX_PATH: /opt/ros/noetic
+#24 26.12 -- This workspace overlays: /opt/ros/noetic
+#24 26.14 -- Found PythonInterp: /usr/bin/python3 (found suitable version "3.8.10", minimum required is "3") 
+#24 26.14 -- Using PYTHON_EXECUTABLE: /usr/bin/python3
+#24 26.14 -- Using Debian Python package layout
+#24 26.14 -- Using empy: /usr/lib/python3/dist-packages/em.py
+#24 26.21 -- Using CATKIN_ENABLE_TESTING: ON
+#24 26.21 -- Call enable_testing()
+#24 26.21 -- Using CATKIN_TEST_RESULTS_DIR: /catkin_ws/build/test_results
+#24 26.24 -- Forcing gtest/gmock from source, though one was otherwise available.
+#24 26.24 -- Found gtest sources under '/usr/src/googletest': gtests will be built
+#24 26.24 -- Found gmock sources under '/usr/src/googletest': gmock will be built
+#24 26.26 -- Found PythonInterp: /usr/bin/python3 (found version "3.8.10") 
+#24 26.26 -- Using Python nosetests: /usr/bin/nosetests3
+#24 26.30 -- catkin 0.8.12
+#24 26.30 -- BUILD_SHARED_LIBS is on
+#24 26.39 -- BUILD_SHARED_LIBS is on
+#24 26.39 -- Using CATKIN_WHITELIST_PACKAGES: cmake_utils;px4ctrl;quadrotor_msgs;uav_utils
+#24 26.56 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#24 26.56 -- ~~  traversing 4 packages in topological order:
+#24 26.56 -- ~~  - cmake_utils
+#24 26.56 -- ~~  - quadrotor_msgs
+#24 26.56 -- ~~  - uav_utils
+#24 26.56 -- ~~  - px4ctrl
+#24 26.56 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#24 26.56 -- +++ processing catkin package: 'cmake_utils'
+#24 26.56 -- ==> add_subdirectory(shiviz_px4_nav/src/utils/cmake_utils)
+#24 26.73 -- +++ processing catkin package: 'quadrotor_msgs'
+#24 26.73 -- ==> add_subdirectory(shiviz_px4_nav/src/utils/quadrotor_msgs)
+#24 26.76 -- Using these message generators: gencpp;geneus;genlisp;gennodejs;genpy
+#24 26.90 -- quadrotor_msgs: 24 messages, 0 services
+#24 27.02 -- +++ processing catkin package: 'uav_utils'
+#24 27.02 -- ==> add_subdirectory(shiviz_px4_nav/src/utils/uav_utils)
+#24 27.21 -- +++ processing catkin package: 'px4ctrl'
+#24 27.21 -- ==> add_subdirectory(shiviz_px4_nav/src/px4ctrl)
+#24 27.28 -- Using these message generators: gencpp;geneus;genlisp;gennodejs;genpy
+#24 27.47 -- Installing devel-space wrapper /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/thrust_calibrate_scrips/thrust_calibrate.py to /catkin_ws/devel/lib/px4ctrl
+#24 27.48 -- Configuring done
+#24 27.48 CMake Warning (dev) at shiviz_px4_nav/src/px4ctrl/CMakeLists.txt:41 (add_dependencies):
+#24 27.48   Policy CMP0046 is not set: Error on non-existent dependency in
+#24 27.48   add_dependencies.  Run "cmake --help-policy CMP0046" for policy details.
+#24 27.48   Use the cmake_policy command to set the policy and suppress this warning.
+#24 27.48 
+#24 27.48   The dependency target "quadrotor_msgs" of target "px4ctrl_node" does not
+#24 27.48   exist.
+#24 27.48 This warning is for project developers.  Use -Wno-dev to suppress it.
+#24 27.48 
+#24 27.52 -- Generating done
+#24 27.53 -- Build files have been written to: /catkin_ws/build
+#24 27.55 Scanning dependencies of target geometry_msgs_generate_messages_cpp
+#24 27.56 [  0%] Built target geometry_msgs_generate_messages_cpp
+#24 27.57 [  0%] Built target nav_msgs_generate_messages_cpp
+#24 27.60 [  0%] Built target _quadrotor_msgs_generate_messages_check_deps_OptimalTimeAllocator
+#24 27.60 [  0%] Built target _quadrotor_msgs_generate_messages_check_deps_SwarmCommand
+#24 27.60 [  0%] Built target _quadrotor_msgs_generate_messages_check_deps_PolynomialTrajectory
+#24 27.60 [  0%] Built target _quadrotor_msgs_generate_messages_check_deps_Px4ctrlDebug
+#24 27.60 [  0%] Built target _quadrotor_msgs_generate_messages_check_deps_Replan
+#24 27.60 [  0%] Built target _quadrotor_msgs_generate_messages_check_deps_TakeoffLand
+#24 27.60 [  0%] Built target _quadrotor_msgs_generate_messages_check_deps_SO3Command
+#24 27.61 [  0%] Built target _quadrotor_msgs_generate_messages_check_deps_SwarmOdometry
+#24 27.61 [  0%] Built target _quadrotor_msgs_generate_messages_check_deps_SwarmInfo
+#24 27.61 [  0%] Built target _quadrotor_msgs_generate_messages_check_deps_Odometry
+#24 27.61 [  0%] Built target _quadrotor_msgs_generate_messages_check_deps_OutputData
+#24 27.61 [  0%] Built target _quadrotor_msgs_generate_messages_check_deps_ReplanCheck
+#24 27.62 [  0%] Built target _quadrotor_msgs_generate_messages_check_deps_AuxCommand
+#24 27.62 [  0%] Built target _quadrotor_msgs_generate_messages_check_deps_StatusData
+#24 27.62 Scanning dependencies of target geometry_msgs_generate_messages_nodejs
+#24 27.62 [  0%] Built target _quadrotor_msgs_generate_messages_check_deps_Bspline
+#24 27.62 Scanning dependencies of target geometry_msgs_generate_messages_eus
+#24 27.62 Scanning dependencies of target geometry_msgs_generate_messages_lisp
+#24 27.62 Scanning dependencies of target geometry_msgs_generate_messages_py
+#24 27.63 [  0%] Built target _quadrotor_msgs_generate_messages_check_deps_TRPYCommand
+#24 27.63 [  0%] Built target nav_msgs_generate_messages_nodejs
+#24 27.63 [  0%] Built target geometry_msgs_generate_messages_nodejs
+#24 27.63 [  0%] Built target nav_msgs_generate_messages_lisp
+#24 27.63 [  0%] Built target geometry_msgs_generate_messages_lisp
+#24 27.63 [  0%] Built target geometry_msgs_generate_messages_eus
+#24 27.64 [  0%] Built target geometry_msgs_generate_messages_py
+#24 27.64 [  0%] Built target nav_msgs_generate_messages_py
+#24 27.64 [  0%] Built target _quadrotor_msgs_generate_messages_check_deps_TrajectoryMatrix
+#24 27.64 [  0%] Built target _quadrotor_msgs_generate_messages_check_deps_Corrections
+#24 27.64 [  0%] Built target nav_msgs_generate_messages_eus
+#24 27.65 [  0%] Built target _quadrotor_msgs_generate_messages_check_deps_PositionCommand
+#24 27.65 [  0%] Built target _quadrotor_msgs_generate_messages_check_deps_SpatialTemporalTrajectory
+#24 27.66 [  0%] Built target _quadrotor_msgs_generate_messages_check_deps_GoalSet
+#24 27.67 [  0%] Built target _quadrotor_msgs_generate_messages_check_deps_Gains
+#24 27.67 [  0%] Built target _quadrotor_msgs_generate_messages_check_deps_PPROutputData
+#24 27.67 [  0%] Built target _quadrotor_msgs_generate_messages_check_deps_Serial
+#24 27.67 make[2]: Warning: File '/catkin_ws/src/shiviz_px4_nav/src/utils/quadrotor_msgs/msg/AuxCommand.msg' has modification time 21230 s in the future
+#24 27.67 make[2]: Warning: File '/catkin_ws/src/shiviz_px4_nav/src/utils/quadrotor_msgs/msg/AuxCommand.msg' has modification time 21230 s in the future
+#24 27.67 make[2]: Warning: File '/catkin_ws/src/shiviz_px4_nav/src/utils/quadrotor_msgs/msg/AuxCommand.msg' has modification time 21230 s in the future
+#24 27.67 make[2]: Warning: File '/catkin_ws/src/shiviz_px4_nav/src/utils/quadrotor_msgs/msg/AuxCommand.msg' has modification time 21230 s in the future
+#24 27.67 make[2]: Warning: File '/catkin_ws/src/shiviz_px4_nav/src/utils/quadrotor_msgs/msg/AuxCommand.msg' has modification time 21230 s in the future
+#24 27.68 [  5%] Generating Python from MSG quadrotor_msgs/AuxCommand
+#24 27.68 [  5%] Generating Javascript code from quadrotor_msgs/GoalSet.msg
+#24 27.68 [  4%] Generating Lisp code from quadrotor_msgs/AuxCommand.msg
+#24 27.68 [  5%] Generating Python from MSG quadrotor_msgs/GoalSet
+#24 27.68 [  5%] Generating C++ code from quadrotor_msgs/Gains.msg
+#24 27.68 [  6%] Generating Javascript code from quadrotor_msgs/Corrections.msg
+#24 27.68 [  5%] Generating Python from MSG quadrotor_msgs/Gains
+#24 27.68 [  5%] Generating Javascript code from quadrotor_msgs/PositionCommand.msg
+#24 27.68 [  6%] Generating Javascript code from quadrotor_msgs/OutputData.msg
+#24 27.68 [  7%] Generating C++ code from quadrotor_msgs/AuxCommand.msg
+#24 27.68 [  5%] Generating Python from MSG quadrotor_msgs/Corrections
+#24 27.68 [  7%] Generating Javascript code from quadrotor_msgs/AuxCommand.msg
+#24 27.68 [  8%] Generating C++ code from quadrotor_msgs/OutputData.msg
+#24 27.68 [ 10%] Generating Javascript code from quadrotor_msgs/Gains.msg
+#24 27.68 [ 10%] Generating C++ code from quadrotor_msgs/Corrections.msg
+#24 27.68 [ 11%] Generating Lisp code from quadrotor_msgs/Corrections.msg
+#24 27.68 [ 13%] Generating C++ code from quadrotor_msgs/GoalSet.msg
+#24 27.69 [ 14%] Generating EusLisp code from quadrotor_msgs/Corrections.msg
+#24 27.69 [ 14%] Generating Javascript code from quadrotor_msgs/PPROutputData.msg
+#24 27.69 [ 15%] Generating EusLisp code from quadrotor_msgs/AuxCommand.msg
+#24 27.75 [ 17%] Generating Lisp code from quadrotor_msgs/Gains.msg
+#24 27.75 [ 17%] Generating EusLisp code from quadrotor_msgs/Gains.msg
+#24 27.75 [ 19%] Generating Javascript code from quadrotor_msgs/Serial.msg
+#24 27.75 [ 19%] Generating C++ code from quadrotor_msgs/PositionCommand.msg
+#24 27.75 [ 20%] Generating EusLisp code from quadrotor_msgs/GoalSet.msg
+#24 27.75 [ 20%] Generating Lisp code from quadrotor_msgs/GoalSet.msg
+#24 27.75 [ 20%] Generating Javascript code from quadrotor_msgs/SO3Command.msg
+#24 27.76 [ 21%] Generating Python from MSG quadrotor_msgs/OutputData
+#24 27.77 [ 22%] Generating Javascript code from quadrotor_msgs/StatusData.msg
+#24 27.80 [ 22%] Generating Lisp code from quadrotor_msgs/OutputData.msg
+#24 27.80 [ 23%] Generating C++ code from quadrotor_msgs/PPROutputData.msg
+#24 27.81 [ 25%] Generating C++ code from quadrotor_msgs/Serial.msg
+#24 27.81 [ 26%] Generating C++ code from quadrotor_msgs/SO3Command.msg
+#24 27.81 [ 27%] Generating EusLisp code from quadrotor_msgs/OutputData.msg
+#24 27.82 [ 28%] Generating Lisp code from quadrotor_msgs/PositionCommand.msg
+#24 27.82 [ 29%] Generating C++ code from quadrotor_msgs/StatusData.msg
+#24 27.82 [ 29%] Generating Lisp code from quadrotor_msgs/PPROutputData.msg
+#24 27.84 [ 29%] Generating Javascript code from quadrotor_msgs/TRPYCommand.msg
+#24 27.84 [ 30%] Generating Javascript code from quadrotor_msgs/Odometry.msg
+#24 27.87 [ 30%] Generating Lisp code from quadrotor_msgs/Serial.msg
+#24 27.87 [ 31%] Generating Javascript code from quadrotor_msgs/OptimalTimeAllocator.msg
+#24 27.87 [ 31%] Generating Javascript code from quadrotor_msgs/PolynomialTrajectory.msg
+#24 27.87 [ 31%] Generating EusLisp code from quadrotor_msgs/PositionCommand.msg
+#24 27.89 [ 32%] Generating Lisp code from quadrotor_msgs/SO3Command.msg
+#24 27.89 [ 33%] Generating Javascript code from quadrotor_msgs/TrajectoryMatrix.msg
+#24 27.91 [ 34%] Generating C++ code from quadrotor_msgs/TRPYCommand.msg
+#24 27.94 [ 35%] Generating Python from MSG quadrotor_msgs/PPROutputData
+#24 27.94 [ 35%] Generating Python from MSG quadrotor_msgs/PositionCommand
+#24 27.94 [ 36%] Generating Lisp code from quadrotor_msgs/StatusData.msg
+#24 27.94 [ 36%] Generating Lisp code from quadrotor_msgs/TRPYCommand.msg
+#24 27.95 [ 38%] Generating C++ code from quadrotor_msgs/Odometry.msg
+#24 27.95 [ 39%] Generating Lisp code from quadrotor_msgs/Odometry.msg
+#24 27.96 [ 41%] Generating Javascript code from quadrotor_msgs/ReplanCheck.msg
+#24 27.96 [ 41%] Generating Lisp code from quadrotor_msgs/PolynomialTrajectory.msg
+#24 27.96 [ 42%] Generating C++ code from quadrotor_msgs/PolynomialTrajectory.msg
+#24 27.96 [ 42%] Generating Javascript code from quadrotor_msgs/Bspline.msg
+#24 27.96 [ 42%] Generating Javascript code from quadrotor_msgs/SwarmCommand.msg
+#24 27.96 [ 43%] Generating Javascript code from quadrotor_msgs/SpatialTemporalTrajectory.msg
+#24 27.97 [ 44%] Generating C++ code from quadrotor_msgs/OptimalTimeAllocator.msg
+#24 27.97 [ 45%] Generating Python from MSG quadrotor_msgs/Serial
+#24 28.00 [ 46%] Generating Python from MSG quadrotor_msgs/SO3Command
+#24 28.01 [ 47%] Generating Javascript code from quadrotor_msgs/Replan.msg
+#24 28.02 [ 48%] Generating Lisp code from quadrotor_msgs/OptimalTimeAllocator.msg
+#24 28.04 [ 50%] Generating EusLisp code from quadrotor_msgs/PPROutputData.msg
+#24 28.04 [ 51%] Generating Javascript code from quadrotor_msgs/SwarmOdometry.msg
+#24 28.04 [ 51%] Generating Python from MSG quadrotor_msgs/StatusData
+#24 28.04 [ 51%] Generating Lisp code from quadrotor_msgs/TrajectoryMatrix.msg
+#24 28.05 [ 53%] Generating C++ code from quadrotor_msgs/TrajectoryMatrix.msg
+#24 28.05 [ 53%] Generating Lisp code from quadrotor_msgs/ReplanCheck.msg
+#24 28.05 [ 54%] Generating Javascript code from quadrotor_msgs/SwarmInfo.msg
+#24 28.05 [ 55%] Generating Javascript code from quadrotor_msgs/Px4ctrlDebug.msg
+#24 28.05 [ 55%] Generating Python from MSG quadrotor_msgs/TRPYCommand
+#24 28.05 [ 55%] Generating C++ code from quadrotor_msgs/ReplanCheck.msg
+#24 28.06 [ 55%] Generating Javascript code from quadrotor_msgs/TakeoffLand.msg
+#24 28.10 [ 56%] Generating Lisp code from quadrotor_msgs/SpatialTemporalTrajectory.msg
+#24 28.10 [ 57%] Generating C++ code from quadrotor_msgs/SpatialTemporalTrajectory.msg
+#24 28.11 [ 58%] Generating C++ code from quadrotor_msgs/Bspline.msg
+#24 28.11 [ 58%] Generating Lisp code from quadrotor_msgs/Bspline.msg
+#24 28.12 [ 59%] Generating C++ code from quadrotor_msgs/Replan.msg
+#24 28.12 [ 59%] Generating C++ code from quadrotor_msgs/SwarmCommand.msg
+#24 28.12 [ 60%] Generating Lisp code from quadrotor_msgs/SwarmCommand.msg
+#24 28.12 make[2]: warning:  Clock skew detected.  Your build may be incomplete.
+#24 28.13 [ 60%] Generating Lisp code from quadrotor_msgs/SwarmOdometry.msg
+#24 28.13 [ 60%] Built target quadrotor_msgs_generate_messages_nodejs
+#24 28.14 [ 61%] Generating C++ code from quadrotor_msgs/SwarmInfo.msg
+#24 28.15 [ 63%] Generating C++ code from quadrotor_msgs/SwarmOdometry.msg
+#24 28.16 [ 64%] Generating Lisp code from quadrotor_msgs/Replan.msg
+#24 28.16 [ 65%] Generating EusLisp code from quadrotor_msgs/Serial.msg
+#24 28.18 [ 66%] Generating Lisp code from quadrotor_msgs/SwarmInfo.msg
+#24 28.19 [ 67%] Generating Lisp code from quadrotor_msgs/Px4ctrlDebug.msg
+#24 28.19 [ 67%] Generating C++ code from quadrotor_msgs/Px4ctrlDebug.msg
+#24 28.20 [ 68%] Generating Python from MSG quadrotor_msgs/Odometry
+#24 28.20 [ 69%] Generating Python from MSG quadrotor_msgs/PolynomialTrajectory
+#24 28.20 [ 70%] Generating Lisp code from quadrotor_msgs/TakeoffLand.msg
+#24 28.23 [ 71%] Generating C++ code from quadrotor_msgs/TakeoffLand.msg
+#24 28.24 [ 72%] Generating Python from MSG quadrotor_msgs/TrajectoryMatrix
+#24 28.24 [ 72%] Generating Python from MSG quadrotor_msgs/OptimalTimeAllocator
+#24 28.24 [ 73%] Generating EusLisp code from quadrotor_msgs/StatusData.msg
+#24 28.24 [ 73%] Generating EusLisp code from quadrotor_msgs/SO3Command.msg
+#24 28.25 [ 75%] Generating EusLisp code from quadrotor_msgs/TRPYCommand.msg
+#24 28.27 [ 76%] Generating EusLisp code from quadrotor_msgs/Odometry.msg
+#24 28.27 [ 77%] Generating Python from MSG quadrotor_msgs/ReplanCheck
+#24 28.27 [ 77%] Generating Python from MSG quadrotor_msgs/SpatialTemporalTrajectory
+#24 28.28 [ 78%] Generating Python from MSG quadrotor_msgs/Bspline
+#24 28.29 [ 80%] Generating Python from MSG quadrotor_msgs/SwarmCommand
+#24 28.29 [ 80%] Generating Python from MSG quadrotor_msgs/Replan
+#24 28.29 [ 80%] Generating EusLisp code from quadrotor_msgs/PolynomialTrajectory.msg
+#24 28.29 [ 80%] Generating Python from MSG quadrotor_msgs/SwarmOdometry
+#24 28.29 make[2]: warning:  Clock skew detected.  Your build may be incomplete.
+#24 28.30 [ 80%] Built target quadrotor_msgs_generate_messages_lisp
+#24 28.32 [ 81%] Generating EusLisp code from quadrotor_msgs/OptimalTimeAllocator.msg
+#24 28.33 [ 82%] Generating EusLisp code from quadrotor_msgs/TrajectoryMatrix.msg
+#24 28.36 [ 83%] Generating Python from MSG quadrotor_msgs/SwarmInfo
+#24 28.37 make[2]: warning:  Clock skew detected.  Your build may be incomplete.
+#24 28.37 [ 83%] Generating EusLisp code from quadrotor_msgs/ReplanCheck.msg
+#24 28.38 [ 84%] Generating Python from MSG quadrotor_msgs/Px4ctrlDebug
+#24 28.38 [ 84%] Built target quadrotor_msgs_generate_messages_cpp
+#24 28.41 Scanning dependencies of target encode_msgs
+#24 28.41 [ 85%] Generating EusLisp code from quadrotor_msgs/SpatialTemporalTrajectory.msg
+#24 28.42 Scanning dependencies of target decode_msgs
+#24 28.42 make[2]: Warning: File '/catkin_ws/src/shiviz_px4_nav/src/utils/quadrotor_msgs/src/decode_msgs.cpp' has modification time 21229 s in the future
+#24 28.42 make[2]: Warning: File '/catkin_ws/src/shiviz_px4_nav/src/utils/quadrotor_msgs/src/encode_msgs.cpp' has modification time 21229 s in the future
+#24 28.43 [ 86%] Generating EusLisp code from quadrotor_msgs/Bspline.msg
+#24 28.44 [ 88%] Building CXX object shiviz_px4_nav/src/utils/quadrotor_msgs/CMakeFiles/encode_msgs.dir/src/encode_msgs.cpp.o
+#24 28.45 [ 88%] Building CXX object shiviz_px4_nav/src/utils/quadrotor_msgs/CMakeFiles/decode_msgs.dir/src/decode_msgs.cpp.o
+#24 28.46 [ 88%] Generating EusLisp code from quadrotor_msgs/SwarmCommand.msg
+#24 28.47 [ 89%] Generating EusLisp code from quadrotor_msgs/Replan.msg
+#24 28.48 [ 90%] Generating EusLisp code from quadrotor_msgs/SwarmOdometry.msg
+#24 28.48 [ 90%] Generating Python from MSG quadrotor_msgs/TakeoffLand
+#24 28.51 [ 91%] Generating EusLisp code from quadrotor_msgs/TakeoffLand.msg
+#24 28.51 [ 91%] Generating EusLisp code from quadrotor_msgs/Px4ctrlDebug.msg
+#24 28.52 [ 92%] Generating EusLisp code from quadrotor_msgs/SwarmInfo.msg
+#24 28.65 make[2]: warning:  Clock skew detected.  Your build may be incomplete.
+#24 28.66 [ 93%] Built target quadrotor_msgs_generate_messages_eus
+#24 28.67 [ 94%] Generating Python msg __init__.py for quadrotor_msgs
+#24 28.79 make[2]: warning:  Clock skew detected.  Your build may be incomplete.
+#24 28.79 [ 94%] Built target quadrotor_msgs_generate_messages_py
+#24 28.81 [ 94%] Built target quadrotor_msgs_generate_messages
+#24 29.02 [ 94%] Linking CXX shared library /catkin_ws/devel/lib/libencode_msgs.so
+#24 29.07 make[2]: warning:  Clock skew detected.  Your build may be incomplete.
+#24 29.07 [ 94%] Built target encode_msgs
+#24 29.35 [ 95%] Linking CXX shared library /catkin_ws/devel/lib/libdecode_msgs.so
+#24 29.40 make[2]: warning:  Clock skew detected.  Your build may be incomplete.
+#24 29.40 [ 95%] Built target decode_msgs
+#24 29.43 Scanning dependencies of target px4ctrl_node
+#24 29.44 make[2]: Warning: File '/catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/px4ctrl_node.cpp' has modification time 21190 s in the future
+#24 29.44 [ 98%] Building CXX object shiviz_px4_nav/src/px4ctrl/CMakeFiles/px4ctrl_node.dir/src/px4ctrl_node.cpp.o
+#24 29.44 [ 98%] Building CXX object shiviz_px4_nav/src/px4ctrl/CMakeFiles/px4ctrl_node.dir/src/PX4CtrlParam.cpp.o
+#24 29.44 [ 98%] Building CXX object shiviz_px4_nav/src/px4ctrl/CMakeFiles/px4ctrl_node.dir/src/controller.cpp.o
+#24 29.44 [ 98%] Building CXX object shiviz_px4_nav/src/px4ctrl/CMakeFiles/px4ctrl_node.dir/src/PX4CtrlFSM.cpp.o
+#24 29.44 [ 98%] Building CXX object shiviz_px4_nav/src/px4ctrl/CMakeFiles/px4ctrl_node.dir/src/input.cpp.o
+#24 30.99 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/px4ctrl_node.cpp: In function ‘int main(int, char**)’:
+#24 30.99 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/px4ctrl_node.cpp:23:14: error: ‘LinearControl’ is not a member of ‘px4ctrl’; did you mean ‘LinearControl’?
+#24 30.99    23 |     px4ctrl::LinearControl controller(param);
+#24 30.99       |              ^~~~~~~~~~~~~
+#24 30.99 In file included from /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.h:14,
+#24 30.99                  from /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/px4ctrl_node.cpp:2:
+#24 30.99 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/controller.h:53:7: note: ‘LinearControl’ declared here
+#24 30.99    53 | class LinearControl
+#24 30.99       |       ^~~~~~~~~~~~~
+#24 30.99 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/px4ctrl_node.cpp:24:36: error: ‘controller’ was not declared in this scope
+#24 30.99    24 |     px4ctrl::PX4CtrlFSM fsm(param, controller);
+#24 30.99       |                                    ^~~~~~~~~~
+#24 30.99 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp: In member function ‘void px4ctrl::PX4CtrlFSM::process()’:
+#24 30.99 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:80:9: error: ‘odom_is_received’ was not declared in this scope
+#24 30.99    80 |    if (!odom_is_received(now_time))
+#24 30.99       |         ^~~~~~~~~~~~~~~~
+#24 31.00 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:85:8: error: ‘cmd_is_received’ was not declared in this scope
+#24 31.00    85 |    if (cmd_is_received(now_time))
+#24 31.00       |        ^~~~~~~~~~~~~~~
+#24 31.00 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:95:9: error: ‘get_landed’ was not declared in this scope; did you mean ‘getLanded’?
+#24 31.00    95 |    if (!get_landed())
+#24 31.00       |         ^~~~~~~~~~
+#24 31.00       |         getLanded
+#24 31.00 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/px4ctrl_node.cpp:100:21: error: ‘class px4ctrl::PX4CtrlFSM’ has no member named ‘rc_is_received’
+#24 31.00   100 |             if (fsm.rc_is_received(ros::Time::now()))
+#24 31.00       |                     ^~~~~~~~~~~~~~
+#24 31.01 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:100:8: error: ‘rc_is_received’ was not declared in this scope
+#24 31.01   100 |    if (rc_is_received(now_time)) // Check this only if RC is connected.
+#24 31.01       |        ^~~~~~~~~~~~~~
+#24 31.01 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:119:4: error: ‘state’ was not declared in this scope; did you mean ‘state_’?
+#24 31.01   119 |    state = AUTO_TAKEOFF;
+#24 31.01       |    ^~~~~
+#24 31.01       |    state_
+#24 31.02 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:119:12: error: ‘AUTO_TAKEOFF’ was not declared in this scope
+#24 31.02   119 |    state = AUTO_TAKEOFF;
+#24 31.02       |            ^~~~~~~~~~~~
+#24 31.02 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/controller.cpp: In member function ‘quadrotor_msgs::Px4ctrlDebug LinearControl::calculateControl(const Desired_State_t&, const Odom_Data_t&, const Imu_Data_t&, Controller_Output_t&)’:
+#24 31.02 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/controller.cpp:37:25: warning: unused variable ‘yaw’ [-Wunused-variable]
+#24 31.02    37 |       double roll,pitch,yaw,yaw_imu;
+#24 31.02       |                         ^~~
+#24 31.02 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/controller.cpp:37:29: warning: variable ‘yaw_imu’ set but not used [-Wunused-but-set-variable]
+#24 31.02    37 |       double roll,pitch,yaw,yaw_imu;
+#24 31.02       |                             ^~~~~~~
+#24 31.03 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:121:4: error: ‘set_start_pose_for_takeoff_land’ was not declared in this scope; did you mean ‘setStartPoseForTakeoffLand’?
+#24 31.03   121 |    set_start_pose_for_takeoff_land(odom_data);
+#24 31.03       |    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#24 31.03       |    setStartPoseForTakeoffLand
+#24 31.04 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:122:4: error: ‘toggle_offboard_mode’ was not declared in this scope; did you mean ‘toggleOffboardMode’?
+#24 31.04   122 |    toggle_offboard_mode(true);      // toggle on offboard before arm
+#24 31.04       |    ^~~~~~~~~~~~~~~~~~~~
+#24 31.04       |    toggleOffboardMode
+#24 31.04 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:130:5: error: ‘toggle_arm_disarm’ was not declared in this scope; did you mean ‘toggleArmDisarm’?
+#24 31.04   130 |     toggle_arm_disarm(true);
+#24 31.04       |     ^~~~~~~~~~~~~~~~~
+#24 31.04       |     toggleArmDisarm
+#24 31.05 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:132:4: error: ‘takeoff_land’ was not declared in this scope; did you mean ‘takeoff_land_’?
+#24 31.05   132 |    takeoff_land.toggle_takeoff_land_time = now_time;
+#24 31.05       |    ^~~~~~~~~~~~
+#24 31.05       |    takeoff_land_
+#24 31.05 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:144:4: error: ‘reboot_FCU’ was not declared in this scope; did you mean ‘reboot_FCU_srv’?
+#24 31.05   144 |    reboot_FCU();
+#24 31.05       |    ^~~~~~~~~~
+#24 31.05       |    reboot_FCU_srv
+#24 31.05 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:150:7: error: ‘AUTO_HOVER’ was not declared in this scope
+#24 31.05   150 |  case AUTO_HOVER:
+#24 31.05       |       ^~~~~~~~~~
+#24 31.06 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:152:34: error: ‘odom_is_received’ was not declared in this scope
+#24 31.06   152 |   if (!rc_data.is_hover_mode || !odom_is_received(now_time))
+#24 31.06       |                                  ^~~~~~~~~~~~~~~~
+#24 31.06 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:154:4: error: ‘state’ was not declared in this scope; did you mean ‘state_’?
+#24 31.06   154 |    state = MANUAL_CTRL;
+#24 31.06       |    ^~~~~
+#24 31.06       |    state_
+#24 31.07 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:154:12: error: ‘MANUAL_CTRL’ was not declared in this scope
+#24 31.07   154 |    state = MANUAL_CTRL;
+#24 31.07       |            ^~~~~~~~~~~
+#24 31.07 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:155:4: error: ‘toggle_offboard_mode’ was not declared in this scope; did you mean ‘toggleOffboardMode’?
+#24 31.07   155 |    toggle_offboard_mode(false);
+#24 31.07       |    ^~~~~~~~~~~~~~~~~~~~
+#24 31.07       |    toggleOffboardMode
+#24 31.08 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:159:39: error: ‘cmd_is_received’ was not declared in this scope
+#24 31.08   159 |   else if (rc_data.is_command_mode && cmd_is_received(now_time))
+#24 31.08       |                                       ^~~~~~~~~~~~~~~
+#24 31.08 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:163:5: error: ‘state’ was not declared in this scope; did you mean ‘state_’?
+#24 31.08   163 |     state = CMD_CTRL;
+#24 31.08       |     ^~~~~
+#24 31.08       |     state_
+#24 31.09 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:163:13: error: ‘CMD_CTRL’ was not declared in this scope
+#24 31.09   163 |     state = CMD_CTRL;
+#24 31.09       |             ^~~~~~~~
+#24 31.09 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:164:11: error: ‘get_cmd_des’ was not declared in this scope
+#24 31.09   164 |     des = get_cmd_des();
+#24 31.09       |           ^~~~~~~~~~~
+#24 31.09 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:171:4: error: ‘state’ was not declared in this scope; did you mean ‘state_’?
+#24 31.09   171 |    state = AUTO_LAND;
+#24 31.09       |    ^~~~~
+#24 31.09       |    state_
+#24 31.10 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:171:12: error: ‘AUTO_LAND’ was not declared in this scope
+#24 31.10   171 |    state = AUTO_LAND;
+#24 31.10       |            ^~~~~~~~~
+#24 31.11 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:172:4: error: ‘set_start_pose_for_takeoff_land’ was not declared in this scope; did you mean ‘setStartPoseForTakeoffLand’?
+#24 31.11   172 |    set_start_pose_for_takeoff_land(odom_data);
+#24 31.11       |    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#24 31.11       |    setStartPoseForTakeoffLand
+#24 31.12 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:178:4: error: ‘set_hov_with_rc’ was not declared in this scope
+#24 31.12   178 |    set_hov_with_rc();
+#24 31.12       |    ^~~~~~~~~~~~~~~
+#24 31.12 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:179:10: error: ‘get_hover_des’ was not declared in this scope
+#24 31.12   179 |    des = get_hover_des();
+#24 31.12       |          ^~~~~~~~~~~~~
+#24 31.12 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:181:6: error: ‘takeoff_land’ was not declared in this scope; did you mean ‘takeoff_land_’?
+#24 31.12   181 |     (takeoff_land.delay_trigger.first && now_time > takeoff_land.delay_trigger.second))
+#24 31.12       |      ^~~~~~~~~~~~
+#24 31.12       |      takeoff_land_
+#24 31.13 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:194:7: error: ‘CMD_CTRL’ was not declared in this scope
+#24 31.13   194 |  case CMD_CTRL:
+#24 31.13       |       ^~~~~~~~
+#24 31.13 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:196:34: error: ‘odom_is_received’ was not declared in this scope
+#24 31.13   196 |   if (!rc_data.is_hover_mode || !odom_is_received(now_time))
+#24 31.13       |                                  ^~~~~~~~~~~~~~~~
+#24 31.14 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:198:4: error: ‘state’ was not declared in this scope; did you mean ‘state_’?
+#24 31.14   198 |    state = MANUAL_CTRL;
+#24 31.14       |    ^~~~~
+#24 31.14       |    state_
+#24 31.14 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:198:12: error: ‘MANUAL_CTRL’ was not declared in this scope
+#24 31.14   198 |    state = MANUAL_CTRL;
+#24 31.14       |            ^~~~~~~~~~~
+#24 31.15 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:199:4: error: ‘toggle_offboard_mode’ was not declared in this scope; did you mean ‘toggleOffboardMode’?
+#24 31.15   199 |    toggle_offboard_mode(false);
+#24 31.15       |    ^~~~~~~~~~~~~~~~~~~~
+#24 31.15       |    toggleOffboardMode
+#24 31.15 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:203:41: error: ‘cmd_is_received’ was not declared in this scope
+#24 31.15   203 |   else if (!rc_data.is_command_mode || !cmd_is_received(now_time))
+#24 31.15       |                                         ^~~~~~~~~~~~~~~
+#24 31.16 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:205:4: error: ‘state’ was not declared in this scope; did you mean ‘state_’?
+#24 31.16   205 |    state = AUTO_HOVER;
+#24 31.16       |    ^~~~~
+#24 31.16       |    state_
+#24 31.17 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:206:4: error: ‘set_hov_with_odom’ was not declared in this scope
+#24 31.17   206 |    set_hov_with_odom();
+#24 31.17       |    ^~~~~~~~~~~~~~~~~
+#24 31.17 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:207:10: error: ‘get_hover_des’ was not declared in this scope
+#24 31.17   207 |    des = get_hover_des();
+#24 31.17       |          ^~~~~~~~~~~~~
+#24 31.17 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:212:10: error: ‘get_cmd_des’ was not declared in this scope
+#24 31.17   212 |    des = get_cmd_des();
+#24 31.17       |          ^~~~~~~~~~~
+#24 31.18 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:225:7: error: ‘AUTO_TAKEOFF’ was not declared in this scope
+#24 31.18   225 |  case AUTO_TAKEOFF:
+#24 31.18       |       ^~~~~~~~~~~~
+#24 31.18 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:227:19: error: ‘takeoff_land’ was not declared in this scope; did you mean ‘takeoff_land_’?
+#24 31.18   227 |   if ((now_time - takeoff_land.toggle_takeoff_land_time).toSec() < AutoTakeoffLand_t::MOTORS_SPEEDUP_TIME) // Wait for several seconds to warn prople.
+#24 31.18       |                   ^~~~~~~~~~~~
+#24 31.18       |                   takeoff_land_
+#24 31.18 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:227:68: error: ‘AutoTakeoffLand_t’ has not been declared
+#24 31.18   227 |   if ((now_time - takeoff_land.toggle_takeoff_land_time).toSec() < AutoTakeoffLand_t::MOTORS_SPEEDUP_TIME) // Wait for several seconds to warn prople.
+#24 31.18       |                                                                    ^~~~~~~~~~~~~~~~~
+#24 31.19 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:229:10: error: ‘get_rotor_speed_up_des’ was not declared in this scope
+#24 31.19   229 |    des = get_rotor_speed_up_des(now_time);
+#24 31.19       |          ^~~~~~~~~~~~~~~~~~~~~~
+#24 31.20 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:233:4: error: ‘state’ was not declared in this scope; did you mean ‘state_’?
+#24 31.20   233 |    state = AUTO_HOVER;
+#24 31.20       |    ^~~~~
+#24 31.20       |    state_
+#24 31.21 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:234:4: error: ‘set_hov_with_odom’ was not declared in this scope
+#24 31.21   234 |    set_hov_with_odom();
+#24 31.21       |    ^~~~~~~~~~~~~~~~~
+#24 31.21 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:238:65: error: ‘AutoTakeoffLand_t’ was not declared in this scope; did you mean ‘AutoTakeoffLandConfig’?
+#24 31.21   238 |    takeoff_land.delay_trigger.second = now_time + ros::Duration(AutoTakeoffLand_t::DELAY_TRIGGER_TIME);
+#24 31.21       |                                                                 ^~~~~~~~~~~~~~~~~
+#24 31.21       |                                                                 AutoTakeoffLandConfig
+#24 31.22 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:242:10: error: ‘get_takeoff_land_des’ was not declared in this scope; did you mean ‘takeoff_land_data’?
+#24 31.22   242 |    des = get_takeoff_land_des(param.takeoff_land.speed);
+#24 31.22       |          ^~~~~~~~~~~~~~~~~~~~
+#24 31.22       |          takeoff_land_data
+#24 31.23 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:248:7: error: ‘AUTO_LAND’ was not declared in this scope
+#24 31.23   248 |  case AUTO_LAND:
+#24 31.23       |       ^~~~~~~~~
+#24 31.23 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:250:34: error: ‘odom_is_received’ was not declared in this scope
+#24 31.23   250 |   if (!rc_data.is_hover_mode || !odom_is_received(now_time))
+#24 31.23       |                                  ^~~~~~~~~~~~~~~~
+#24 31.24 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:252:4: error: ‘state’ was not declared in this scope; did you mean ‘state_’?
+#24 31.24   252 |    state = MANUAL_CTRL;
+#24 31.24       |    ^~~~~
+#24 31.24       |    state_
+#24 31.24 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:252:12: error: ‘MANUAL_CTRL’ was not declared in this scope
+#24 31.24   252 |    state = MANUAL_CTRL;
+#24 31.24       |            ^~~~~~~~~~~
+#24 31.25 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:253:4: error: ‘toggle_offboard_mode’ was not declared in this scope; did you mean ‘toggleOffboardMode’?
+#24 31.25   253 |    toggle_offboard_mode(false);
+#24 31.25       |    ^~~~~~~~~~~~~~~~~~~~
+#24 31.25       |    toggleOffboardMode
+#24 31.25 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:259:4: error: ‘state’ was not declared in this scope; did you mean ‘state_’?
+#24 31.25   259 |    state = AUTO_HOVER;
+#24 31.25       |    ^~~~~
+#24 31.25       |    state_
+#24 31.26 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:260:4: error: ‘set_hov_with_odom’ was not declared in this scope
+#24 31.26   260 |    set_hov_with_odom();
+#24 31.26       |    ^~~~~~~~~~~~~~~~~
+#24 31.26 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:261:10: error: ‘get_hover_des’ was not declared in this scope
+#24 31.26   261 |    des = get_hover_des();
+#24 31.26       |          ^~~~~~~~~~~~~
+#24 31.27 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:264:13: error: ‘get_landed’ was not declared in this scope; did you mean ‘getLanded’?
+#24 31.27   264 |   else if (!get_landed())
+#24 31.27       |             ^~~~~~~~~~
+#24 31.27       |             getLanded
+#24 31.27 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:266:10: error: ‘get_takeoff_land_des’ was not declared in this scope; did you mean ‘takeoff_land_data’?
+#24 31.27   266 |    des = get_takeoff_land_des(-param.takeoff_land.speed);
+#24 31.27       |          ^~~~~~~~~~~~~~~~~~~~
+#24 31.27       |          takeoff_land_data
+#24 31.28 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:284:10: error: ‘toggle_arm_disarm’ was not declared in this scope; did you mean ‘toggleArmDisarm’?
+#24 31.28   284 |      if (toggle_arm_disarm(false)) // disarm
+#24 31.28       |          ^~~~~~~~~~~~~~~~~
+#24 31.28       |          toggleArmDisarm
+#24 31.28 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:287:7: error: ‘state’ was not declared in this scope; did you mean ‘state_’?
+#24 31.28   287 |       state = MANUAL_CTRL;
+#24 31.28       |       ^~~~~
+#24 31.28       |       state_
+#24 31.29 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:287:15: error: ‘MANUAL_CTRL’ was not declared in this scope
+#24 31.29   287 |       state = MANUAL_CTRL;
+#24 31.29       |               ^~~~~~~~~~~
+#24 31.29 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:288:7: error: ‘toggle_offboard_mode’ was not declared in this scope; did you mean ‘toggleOffboardMode’?
+#24 31.29   288 |       toggle_offboard_mode(false); // toggle off offboard after disarm
+#24 31.29       |       ^~~~~~~~~~~~~~~~~~~~
+#24 31.29       |       toggleOffboardMode
+#24 31.29 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:305:6: error: ‘state’ was not declared in this scope; did you mean ‘state_’?
+#24 31.29   305 |  if (state == AUTO_HOVER || state == CMD_CTRL)
+#24 31.29       |      ^~~~~
+#24 31.29       |      state_
+#24 31.30 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:305:15: error: ‘AUTO_HOVER’ was not declared in this scope
+#24 31.30   305 |  if (state == AUTO_HOVER || state == CMD_CTRL)
+#24 31.30       |               ^~~~~~~~~~
+#24 31.30 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:305:38: error: ‘CMD_CTRL’ was not declared in this scope
+#24 31.30   305 |  if (state == AUTO_HOVER || state == CMD_CTRL)
+#24 31.30       |                                      ^~~~~~~~
+#24 31.31 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:315:3: error: ‘motors_idling’ was not declared in this scope
+#24 31.31   315 |   motors_idling(imu_data, u);
+#24 31.31       |   ^~~~~~~~~~~~~
+#24 31.31 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:335:16: error: ‘state’ was not declared in this scope; did you mean ‘state_’?
+#24 31.31   335 |  land_detector(state, des, odom_data);
+#24 31.31       |                ^~~~~
+#24 31.31       |                state_
+#24 31.31 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:335:2: error: ‘land_detector’ was not declared in this scope
+#24 31.31   335 |  land_detector(state, des, odom_data);
+#24 31.31       |  ^~~~~~~~~~~~~
+#24 31.31 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp: At global scope:
+#24 31.31 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:346:6: error: no declaration matches ‘void px4ctrl::PX4CtrlFSM::motors_idling(const Imu_Data_t&, Controller_Output_t&)’
+#24 31.31   346 | void PX4CtrlFSM::motors_idling(const Imu_Data_t &imu, Controller_Output_t &u)
+#24 31.31       |      ^~~~~~~~~~
+#24 31.31 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:346:6: note: no functions named ‘void px4ctrl::PX4CtrlFSM::motors_idling(const Imu_Data_t&, Controller_Output_t&)’
+#24 31.31 In file included from /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:1:
+#24 31.31 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.h:48:7: note: ‘class px4ctrl::PX4CtrlFSM’ defined here
+#24 31.31    48 | class PX4CtrlFSM
+#24 31.31       |       ^~~~~~~~~~
+#24 31.32 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:353:38: error: ‘State_t’ does not name a type; did you mean ‘mbstate_t’?
+#24 31.32   353 | void PX4CtrlFSM::land_detector(const State_t state, const Desired_State_t &des, const Odom_Data_t &odom)
+#24 31.32       |                                      ^~~~~~~
+#24 31.32       |                                      mbstate_t
+#24 31.32 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:353:6: error: no declaration matches ‘void px4ctrl::PX4CtrlFSM::land_detector(int, const Desired_State_t&, const Odom_Data_t&)’
+#24 31.32   353 | void PX4CtrlFSM::land_detector(const State_t state, const Desired_State_t &des, const Odom_Data_t &odom)
+#24 31.32       |      ^~~~~~~~~~
+#24 31.32 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:353:6: note: no functions named ‘void px4ctrl::PX4CtrlFSM::land_detector(int, const Desired_State_t&, const Odom_Data_t&)’
+#24 31.32 In file included from /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:1:
+#24 31.32 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.h:48:7: note: ‘class px4ctrl::PX4CtrlFSM’ defined here
+#24 31.32    48 | class PX4CtrlFSM
+#24 31.32       |       ^~~~~~~~~~
+#24 31.32 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:399:17: error: no declaration matches ‘Desired_State_t px4ctrl::PX4CtrlFSM::get_hover_des()’
+#24 31.32   399 | Desired_State_t PX4CtrlFSM::get_hover_des()
+#24 31.32       |                 ^~~~~~~~~~
+#24 31.32 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:399:17: note: no functions named ‘Desired_State_t px4ctrl::PX4CtrlFSM::get_hover_des()’
+#24 31.32 In file included from /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:1:
+#24 31.32 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.h:48:7: note: ‘class px4ctrl::PX4CtrlFSM’ defined here
+#24 31.32    48 | class PX4CtrlFSM
+#24 31.32       |       ^~~~~~~~~~
+#24 31.32 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:412:17: error: no declaration matches ‘Desired_State_t px4ctrl::PX4CtrlFSM::get_cmd_des()’
+#24 31.32   412 | Desired_State_t PX4CtrlFSM::get_cmd_des()
+#24 31.32       |                 ^~~~~~~~~~
+#24 31.32 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:412:17: note: no functions named ‘Desired_State_t px4ctrl::PX4CtrlFSM::get_cmd_des()’
+#24 31.32 In file included from /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:1:
+#24 31.32 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.h:48:7: note: ‘class px4ctrl::PX4CtrlFSM’ defined here
+#24 31.32    48 | class PX4CtrlFSM
+#24 31.32       |       ^~~~~~~~~~
+#24 31.32 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:425:17: error: no declaration matches ‘Desired_State_t px4ctrl::PX4CtrlFSM::get_rotor_speed_up_des(ros::Time)’
+#24 31.32   425 | Desired_State_t PX4CtrlFSM::get_rotor_speed_up_des(const ros::Time now)
+#24 31.32       |                 ^~~~~~~~~~
+#24 31.32 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:425:17: note: no functions named ‘Desired_State_t px4ctrl::PX4CtrlFSM::get_rotor_speed_up_des(ros::Time)’
+#24 31.32 In file included from /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:1:
+#24 31.32 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.h:48:7: note: ‘class px4ctrl::PX4CtrlFSM’ defined here
+#24 31.32    48 | class PX4CtrlFSM
+#24 31.32       |       ^~~~~~~~~~
+#24 31.32 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:446:17: error: no declaration matches ‘Desired_State_t px4ctrl::PX4CtrlFSM::get_takeoff_land_des(double)’
+#24 31.32   446 | Desired_State_t PX4CtrlFSM::get_takeoff_land_des(const double speed)
+#24 31.32       |                 ^~~~~~~~~~
+#24 31.32 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:446:17: note: no functions named ‘Desired_State_t px4ctrl::PX4CtrlFSM::get_takeoff_land_des(double)’
+#24 31.32 In file included from /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:1:
+#24 31.32 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.h:48:7: note: ‘class px4ctrl::PX4CtrlFSM’ defined here
+#24 31.32    48 | class PX4CtrlFSM
+#24 31.32       |       ^~~~~~~~~~
+#24 31.32 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:465:6: error: no declaration matches ‘void px4ctrl::PX4CtrlFSM::set_hov_with_odom()’
+#24 31.32   465 | void PX4CtrlFSM::set_hov_with_odom()
+#24 31.32       |      ^~~~~~~~~~
+#24 31.32 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:465:6: note: no functions named ‘void px4ctrl::PX4CtrlFSM::set_hov_with_odom()’
+#24 31.32 In file included from /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:1:
+#24 31.32 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.h:48:7: note: ‘class px4ctrl::PX4CtrlFSM’ defined here
+#24 31.32    48 | class PX4CtrlFSM
+#24 31.32       |       ^~~~~~~~~~
+#24 31.32 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:473:6: error: no declaration matches ‘void px4ctrl::PX4CtrlFSM::set_hov_with_rc()’
+#24 31.32   473 | void PX4CtrlFSM::set_hov_with_rc()
+#24 31.32       |      ^~~~~~~~~~
+#24 31.32 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:473:6: note: no functions named ‘void px4ctrl::PX4CtrlFSM::set_hov_with_rc()’
+#24 31.32 In file included from /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:1:
+#24 31.32 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.h:48:7: note: ‘class px4ctrl::PX4CtrlFSM’ defined here
+#24 31.32    48 | class PX4CtrlFSM
+#24 31.32       |       ^~~~~~~~~~
+#24 31.32 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:498:6: error: no declaration matches ‘void px4ctrl::PX4CtrlFSM::set_start_pose_for_takeoff_land(const Odom_Data_t&)’
+#24 31.32   498 | void PX4CtrlFSM::set_start_pose_for_takeoff_land(const Odom_Data_t &odom)
+#24 31.32       |      ^~~~~~~~~~
+#24 31.32 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:498:6: note: no functions named ‘void px4ctrl::PX4CtrlFSM::set_start_pose_for_takeoff_land(const Odom_Data_t&)’
+#24 31.32 In file included from /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:1:
+#24 31.32 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.h:48:7: note: ‘class px4ctrl::PX4CtrlFSM’ defined here
+#24 31.32    48 | class PX4CtrlFSM
+#24 31.32       |       ^~~~~~~~~~
+#24 31.32 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:506:6: error: no declaration matches ‘bool px4ctrl::PX4CtrlFSM::rc_is_received(const ros::Time&)’
+#24 31.32   506 | bool PX4CtrlFSM::rc_is_received(const ros::Time &now_time)
+#24 31.32       |      ^~~~~~~~~~
+#24 31.32 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:506:6: note: no functions named ‘bool px4ctrl::PX4CtrlFSM::rc_is_received(const ros::Time&)’
+#24 31.32 In file included from /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:1:
+#24 31.32 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.h:48:7: note: ‘class px4ctrl::PX4CtrlFSM’ defined here
+#24 31.32    48 | class PX4CtrlFSM
+#24 31.32       |       ^~~~~~~~~~
+#24 31.32 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:511:6: error: no declaration matches ‘bool px4ctrl::PX4CtrlFSM::cmd_is_received(const ros::Time&)’
+#24 31.32   511 | bool PX4CtrlFSM::cmd_is_received(const ros::Time &now_time)
+#24 31.32       |      ^~~~~~~~~~
+#24 31.32 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:511:6: note: no functions named ‘bool px4ctrl::PX4CtrlFSM::cmd_is_received(const ros::Time&)’
+#24 31.32 In file included from /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:1:
+#24 31.32 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.h:48:7: note: ‘class px4ctrl::PX4CtrlFSM’ defined here
+#24 31.32    48 | class PX4CtrlFSM
+#24 31.32       |       ^~~~~~~~~~
+#24 31.32 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:516:6: error: no declaration matches ‘bool px4ctrl::PX4CtrlFSM::odom_is_received(const ros::Time&)’
+#24 31.32   516 | bool PX4CtrlFSM::odom_is_received(const ros::Time &now_time)
+#24 31.32       |      ^~~~~~~~~~
+#24 31.32 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:516:6: note: no functions named ‘bool px4ctrl::PX4CtrlFSM::odom_is_received(const ros::Time&)’
+#24 31.32 In file included from /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:1:
+#24 31.32 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.h:48:7: note: ‘class px4ctrl::PX4CtrlFSM’ defined here
+#24 31.32    48 | class PX4CtrlFSM
+#24 31.32       |       ^~~~~~~~~~
+#24 31.32 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:521:6: error: no declaration matches ‘bool px4ctrl::PX4CtrlFSM::imu_is_received(const ros::Time&)’
+#24 31.32   521 | bool PX4CtrlFSM::imu_is_received(const ros::Time &now_time)
+#24 31.32       |      ^~~~~~~~~~
+#24 31.32 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:521:6: note: no functions named ‘bool px4ctrl::PX4CtrlFSM::imu_is_received(const ros::Time&)’
+#24 31.32 In file included from /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:1:
+#24 31.32 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.h:48:7: note: ‘class px4ctrl::PX4CtrlFSM’ defined here
+#24 31.32    48 | class PX4CtrlFSM
+#24 31.32       |       ^~~~~~~~~~
+#24 31.32 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:526:6: error: no declaration matches ‘bool px4ctrl::PX4CtrlFSM::bat_is_received(const ros::Time&)’
+#24 31.32   526 | bool PX4CtrlFSM::bat_is_received(const ros::Time &now_time)
+#24 31.32       |      ^~~~~~~~~~
+#24 31.32 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:526:6: note: no functions named ‘bool px4ctrl::PX4CtrlFSM::bat_is_received(const ros::Time&)’
+#24 31.32 In file included from /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:1:
+#24 31.32 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.h:48:7: note: ‘class px4ctrl::PX4CtrlFSM’ defined here
+#24 31.32    48 | class PX4CtrlFSM
+#24 31.32       |       ^~~~~~~~~~
+#24 31.32 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:531:6: error: no declaration matches ‘bool px4ctrl::PX4CtrlFSM::recv_new_odom()’
+#24 31.32   531 | bool PX4CtrlFSM::recv_new_odom()
+#24 31.32       |      ^~~~~~~~~~
+#24 31.32 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:531:6: note: no functions named ‘bool px4ctrl::PX4CtrlFSM::recv_new_odom()’
+#24 31.32 In file included from /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:1:
+#24 31.32 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.h:48:7: note: ‘class px4ctrl::PX4CtrlFSM’ defined here
+#24 31.32    48 | class PX4CtrlFSM
+#24 31.32       |       ^~~~~~~~~~
+#24 31.32 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:590:6: error: no declaration matches ‘bool px4ctrl::PX4CtrlFSM::toggle_offboard_mode(bool)’
+#24 31.32   590 | bool PX4CtrlFSM::toggle_offboard_mode(bool on_off)
+#24 31.32       |      ^~~~~~~~~~
+#24 31.32 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:590:6: note: no functions named ‘bool px4ctrl::PX4CtrlFSM::toggle_offboard_mode(bool)’
+#24 31.32 In file included from /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:1:
+#24 31.32 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.h:48:7: note: ‘class px4ctrl::PX4CtrlFSM’ defined here
+#24 31.32    48 | class PX4CtrlFSM
+#24 31.32       |       ^~~~~~~~~~
+#24 31.32 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:623:6: error: no declaration matches ‘bool px4ctrl::PX4CtrlFSM::toggle_arm_disarm(bool)’
+#24 31.32   623 | bool PX4CtrlFSM::toggle_arm_disarm(bool arm)
+#24 31.32       |      ^~~~~~~~~~
+#24 31.32 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:623:6: note: no functions named ‘bool px4ctrl::PX4CtrlFSM::toggle_arm_disarm(bool)’
+#24 31.32 In file included from /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:1:
+#24 31.32 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.h:48:7: note: ‘class px4ctrl::PX4CtrlFSM’ defined here
+#24 31.32    48 | class PX4CtrlFSM
+#24 31.32       |       ^~~~~~~~~~
+#24 31.32 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:640:6: error: no declaration matches ‘void px4ctrl::PX4CtrlFSM::reboot_FCU()’
+#24 31.32   640 | void PX4CtrlFSM::reboot_FCU()
+#24 31.32       |      ^~~~~~~~~~
+#24 31.32 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:640:6: note: no functions named ‘void px4ctrl::PX4CtrlFSM::reboot_FCU()’
+#24 31.32 In file included from /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.cpp:1:
+#24 31.32 /catkin_ws/src/shiviz_px4_nav/src/px4ctrl/src/PX4CtrlFSM.h:48:7: note: ‘class px4ctrl::PX4CtrlFSM’ defined here
+#24 31.32    48 | class PX4CtrlFSM
+#24 31.32       |       ^~~~~~~~~~
+#24 31.54 make[2]: *** [shiviz_px4_nav/src/px4ctrl/CMakeFiles/px4ctrl_node.dir/build.make:63: shiviz_px4_nav/src/px4ctrl/CMakeFiles/px4ctrl_node.dir/src/px4ctrl_node.cpp.o] Error 1
+#24 31.54 make[2]: *** Waiting for unfinished jobs....
+#24 31.61 make[2]: *** [shiviz_px4_nav/src/px4ctrl/CMakeFiles/px4ctrl_node.dir/build.make:76: shiviz_px4_nav/src/px4ctrl/CMakeFiles/px4ctrl_node.dir/src/PX4CtrlFSM.cpp.o] Error 1
+#24 32.25 make[1]: *** [CMakeFiles/Makefile2:2926: shiviz_px4_nav/src/px4ctrl/CMakeFiles/px4ctrl_node.dir/all] Error 2
+#24 32.25 make: *** [Makefile:141: all] Error 2
+#24 32.25 Base path: /catkin_ws
+#24 32.25 Source space: /catkin_ws/src
+#24 32.25 Build space: /catkin_ws/build
+#24 32.25 Devel space: /catkin_ws/devel
+#24 32.25 Install space: /catkin_ws/install
+#24 32.25 Whitelisted packages: cmake_utils, px4ctrl, quadrotor_msgs, uav_utils
+#24 32.25 ####
+#24 32.25 #### Running command: "cmake /catkin_ws/src -DCMAKE_BUILD_TYPE=Release -DCATKIN_DEVEL_PREFIX=/catkin_ws/devel -DCMAKE_INSTALL_PREFIX=/catkin_ws/install -DCATKIN_WHITELIST_PACKAGES=cmake_utils;px4ctrl;quadrotor_msgs;uav_utils -G Unix Makefiles" in "/catkin_ws/build"
+#24 32.25 ####
+#24 32.25 ####
+#24 32.25 #### Running command: "make -j20 -l20" in "/catkin_ws/build"
+#24 32.25 ####
+#24 32.25 Invoking "make -j20 -l20" failed
+#24 32.26 px4ctrl build failed, continuing...
+#24 32.26 Building visualization packages...
+#24 32.37 -- Using CATKIN_DEVEL_PREFIX: /catkin_ws/devel
+#24 32.37 -- Using CMAKE_PREFIX_PATH: /opt/ros/noetic
+#24 32.37 -- This workspace overlays: /opt/ros/noetic
+#24 32.38 -- Found PythonInterp: /usr/bin/python3 (found suitable version "3.8.10", minimum required is "3") 
+#24 32.38 -- Using PYTHON_EXECUTABLE: /usr/bin/python3
+#24 32.38 -- Using Debian Python package layout
+#24 32.38 -- Using empy: /usr/lib/python3/dist-packages/em.py
+#24 32.47 -- Using CATKIN_ENABLE_TESTING: ON
+#24 32.47 -- Call enable_testing()
+#24 32.47 -- Using CATKIN_TEST_RESULTS_DIR: /catkin_ws/build/test_results
+#24 32.50 -- Forcing gtest/gmock from source, though one was otherwise available.
+#24 32.50 -- Found gtest sources under '/usr/src/googletest': gtests will be built
+#24 32.50 -- Found gmock sources under '/usr/src/googletest': gmock will be built
+#24 32.52 -- Found PythonInterp: /usr/bin/python3 (found version "3.8.10") 
+#24 32.52 -- Using Python nosetests: /usr/bin/nosetests3
+#24 32.56 -- catkin 0.8.12
+#24 32.56 -- BUILD_SHARED_LIBS is on
+#24 32.65 -- BUILD_SHARED_LIBS is on
+#24 32.65 -- Using CATKIN_WHITELIST_PACKAGES: catkin_simple;decomp_ros_msgs;decomp_ros_utils;rviz_plugins
+#24 32.83 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#24 32.83 -- ~~  traversing 4 packages in topological order:
+#24 32.83 -- ~~  - catkin_simple
+#24 32.83 -- ~~  - decomp_ros_msgs
+#24 32.83 -- ~~  - decomp_ros_utils
+#24 32.83 -- ~~  - rviz_plugins
+#24 32.83 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#24 32.83 -- +++ processing catkin package: 'catkin_simple'
+#24 32.83 -- ==> add_subdirectory(shiviz_px4_nav/src/utils/catkin_simple)
+#24 33.00 -- +++ processing catkin package: 'decomp_ros_msgs'
+#24 33.00 -- ==> add_subdirectory(shiviz_px4_nav/src/utils/DecompROS/decomp_ros_msgs)
+#24 33.05 -- Using these message generators: gencpp;geneus;genlisp;gennodejs;genpy
+#24 33.18 -- decomp_ros_msgs: 4 messages, 0 services
+#24 33.25 -- +++ processing catkin package: 'decomp_ros_utils'
+#24 33.25 -- ==> add_subdirectory(shiviz_px4_nav/src/utils/DecompROS/decomp_ros_utils)
+#24 33.31 -- Using these message generators: gencpp;geneus;genlisp;gennodejs;genpy
+#24 33.44 -- Using Qt5 based on the rviz_QT_VERSION: 5.12.8
+#24 33.54 -- Marking SHARED_LIBRARY "decomp_rviz_plugins" of package "decomp_ros_utils" for installation
+#24 33.54 -- Marking HEADER FILES in "include" folder of package "decomp_ros_utils" for installation
+#24 33.62 -- +++ processing catkin package: 'rviz_plugins'
+#24 33.62 -- ==> add_subdirectory(shiviz_px4_nav/src/utils/rviz_plugins)
+#24 33.67 -- Using these message generators: gencpp;geneus;genlisp;gennodejs;genpy
+#24 33.83 CMake Warning at /opt/ros/noetic/share/catkin/cmake/catkin_package.cmake:166 (message):
+#24 33.83   catkin_package() DEPENDS on 'system_lib' but neither
+#24 33.83   'system_lib_INCLUDE_DIRS' nor 'system_lib_LIBRARIES' is defined.
+#24 33.83 Call Stack (most recent call first):
+#24 33.83   /opt/ros/noetic/share/catkin/cmake/catkin_package.cmake:102 (_catkin_package)
+#24 33.83   shiviz_px4_nav/src/utils/rviz_plugins/CMakeLists.txt:12 (catkin_package)
+#24 33.83 
+#24 33.83 
+#24 33.90 -- Using Qt5 based on the rviz_QT_VERSION: 5.12.8
+#24 33.91 -- Configuring done
+#24 33.94 CMake Warning (dev) at shiviz_px4_nav/src/utils/rviz_plugins/CMakeLists.txt:66 (add_dependencies):
+#24 33.94   Policy CMP0046 is not set: Error on non-existent dependency in
+#24 33.94   add_dependencies.  Run "cmake --help-policy CMP0046" for policy details.
+#24 33.94   Use the cmake_policy command to set the policy and suppress this warning.
+#24 33.94 
+#24 33.94   The dependency target "multi_map_server_generate_messages_cpp" of target
+#24 33.94   "rviz_plugins" does not exist.
+#24 33.94 This warning is for project developers.  Use -Wno-dev to suppress it.
+#24 33.94 
+#24 33.97 -- Generating done
+#24 33.98 -- Build files have been written to: /catkin_ws/build
+#24 34.05 -- Using CATKIN_DEVEL_PREFIX: /catkin_ws/devel
+#24 34.05 -- Using CMAKE_PREFIX_PATH: /opt/ros/noetic
+#24 34.05 -- This workspace overlays: /opt/ros/noetic
+#24 34.06 -- Found PythonInterp: /usr/bin/python3 (found suitable version "3.8.10", minimum required is "3") 
+#24 34.06 -- Using PYTHON_EXECUTABLE: /usr/bin/python3
+#24 34.06 -- Using Debian Python package layout
+#24 34.06 -- Using empy: /usr/lib/python3/dist-packages/em.py
+#24 34.14 -- Using CATKIN_ENABLE_TESTING: ON
+#24 34.14 -- Call enable_testing()
+#24 34.14 -- Using CATKIN_TEST_RESULTS_DIR: /catkin_ws/build/test_results
+#24 34.17 -- Forcing gtest/gmock from source, though one was otherwise available.
+#24 34.17 -- Found gtest sources under '/usr/src/googletest': gtests will be built
+#24 34.17 -- Found gmock sources under '/usr/src/googletest': gmock will be built
+#24 34.19 -- Found PythonInterp: /usr/bin/python3 (found version "3.8.10") 
+#24 34.19 -- Using Python nosetests: /usr/bin/nosetests3
+#24 34.23 -- catkin 0.8.12
+#24 34.23 -- BUILD_SHARED_LIBS is on
+#24 34.32 -- BUILD_SHARED_LIBS is on
+#24 34.32 -- Using CATKIN_WHITELIST_PACKAGES: catkin_simple;decomp_ros_msgs;decomp_ros_utils;rviz_plugins
+#24 34.49 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#24 34.49 -- ~~  traversing 4 packages in topological order:
+#24 34.49 -- ~~  - catkin_simple
+#24 34.49 -- ~~  - decomp_ros_msgs
+#24 34.49 -- ~~  - decomp_ros_utils
+#24 34.49 -- ~~  - rviz_plugins
+#24 34.49 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#24 34.49 -- +++ processing catkin package: 'catkin_simple'
+#24 34.49 -- ==> add_subdirectory(shiviz_px4_nav/src/utils/catkin_simple)
+#24 34.67 -- +++ processing catkin package: 'decomp_ros_msgs'
+#24 34.67 -- ==> add_subdirectory(shiviz_px4_nav/src/utils/DecompROS/decomp_ros_msgs)
+#24 34.72 -- Using these message generators: gencpp;geneus;genlisp;gennodejs;genpy
+#24 34.84 -- decomp_ros_msgs: 4 messages, 0 services
+#24 34.92 -- +++ processing catkin package: 'decomp_ros_utils'
+#24 34.92 -- ==> add_subdirectory(shiviz_px4_nav/src/utils/DecompROS/decomp_ros_utils)
+#24 34.97 -- Using these message generators: gencpp;geneus;genlisp;gennodejs;genpy
+#24 35.10 -- Using Qt5 based on the rviz_QT_VERSION: 5.12.8
+#24 35.20 -- Marking SHARED_LIBRARY "decomp_rviz_plugins" of package "decomp_ros_utils" for installation
+#24 35.20 -- Marking HEADER FILES in "include" folder of package "decomp_ros_utils" for installation
+#24 35.29 -- +++ processing catkin package: 'rviz_plugins'
+#24 35.29 -- ==> add_subdirectory(shiviz_px4_nav/src/utils/rviz_plugins)
+#24 35.34 -- Using these message generators: gencpp;geneus;genlisp;gennodejs;genpy
+#24 35.52 CMake Warning at /opt/ros/noetic/share/catkin/cmake/catkin_package.cmake:166 (message):
+#24 35.52   catkin_package() DEPENDS on 'system_lib' but neither
+#24 35.52   'system_lib_INCLUDE_DIRS' nor 'system_lib_LIBRARIES' is defined.
+#24 35.52 Call Stack (most recent call first):
+#24 35.52   /opt/ros/noetic/share/catkin/cmake/catkin_package.cmake:102 (_catkin_package)
+#24 35.52   shiviz_px4_nav/src/utils/rviz_plugins/CMakeLists.txt:12 (catkin_package)
+#24 35.52 
+#24 35.52 
+#24 35.59 -- Using Qt5 based on the rviz_QT_VERSION: 5.12.8
+#24 35.60 -- Configuring done
+#24 35.63 CMake Warning (dev) at shiviz_px4_nav/src/utils/rviz_plugins/CMakeLists.txt:66 (add_dependencies):
+#24 35.63   Policy CMP0046 is not set: Error on non-existent dependency in
+#24 35.63   add_dependencies.  Run "cmake --help-policy CMP0046" for policy details.
+#24 35.63   Use the cmake_policy command to set the policy and suppress this warning.
+#24 35.63 
+#24 35.63   The dependency target "multi_map_server_generate_messages_cpp" of target
+#24 35.63   "rviz_plugins" does not exist.
+#24 35.63 This warning is for project developers.  Use -Wno-dev to suppress it.
+#24 35.63 
+#24 35.66 -- Generating done
+#24 35.67 -- Build files have been written to: /catkin_ws/build
+#24 35.70 Scanning dependencies of target std_srvs_generate_messages_nodejs
+#24 35.70 Scanning dependencies of target _catkin_empty_exported_target
+#24 35.70 Scanning dependencies of target nav_msgs_generate_messages_eus
+#24 35.70 Scanning dependencies of target std_msgs_generate_messages_nodejs
+#24 35.70 Scanning dependencies of target std_msgs_generate_messages_cpp
+#24 35.70 Scanning dependencies of target std_msgs_generate_messages_eus
+#24 35.70 Scanning dependencies of target std_msgs_generate_messages_py
+#24 35.70 Scanning dependencies of target actionlib_msgs_generate_messages_cpp
+#24 35.70 Scanning dependencies of target map_msgs_generate_messages_eus
+#24 35.70 Scanning dependencies of target std_msgs_generate_messages_lisp
+#24 35.71 Scanning dependencies of target actionlib_generate_messages_nodejs
+#24 35.71 [  0%] Built target geometry_msgs_generate_messages_nodejs
+#24 35.71 [  0%] Built target std_srvs_generate_messages_nodejs
+#24 35.71 [  0%] Built target std_msgs_generate_messages_py
+#24 35.71 [  0%] Built target geometry_msgs_generate_messages_py
+#24 35.71 [  0%] Built target std_msgs_generate_messages_lisp
+#24 35.71 [  0%] Built target geometry_msgs_generate_messages_lisp
+#24 35.71 [  0%] Built target geometry_msgs_generate_messages_eus
+#24 35.71 [  0%] Built target _catkin_empty_exported_target
+#24 35.71 [  0%] Built target std_msgs_generate_messages_eus
+#24 35.71 [  0%] Built target std_msgs_generate_messages_nodejs
+#24 35.71 [  0%] Built target std_msgs_generate_messages_cpp
+#24 35.72 [  0%] Built target geometry_msgs_generate_messages_cpp
+#24 35.72 [  0%] Built target nav_msgs_generate_messages_eus
+#24 35.72 [  0%] Built target actionlib_msgs_generate_messages_cpp
+#24 35.72 [  0%] Built target map_msgs_generate_messages_eus
+#24 35.72 [  0%] Built target actionlib_generate_messages_nodejs
+#24 35.72 Scanning dependencies of target actionlib_generate_messages_cpp
+#24 35.72 Scanning dependencies of target actionlib_generate_messages_lisp
+#24 35.72 Scanning dependencies of target rviz_generate_messages_cpp
+#24 35.72 Scanning dependencies of target rviz_generate_messages_lisp
+#24 35.72 Scanning dependencies of target actionlib_msgs_generate_messages_py
+#24 35.72 Scanning dependencies of target rosgraph_msgs_generate_messages_nodejs
+#24 35.72 Scanning dependencies of target roscpp_generate_messages_lisp
+#24 35.73 Scanning dependencies of target std_srvs_generate_messages_py
+#24 35.73 Scanning dependencies of target nav_msgs_generate_messages_nodejs
+#24 35.73 Scanning dependencies of target map_msgs_generate_messages_nodejs
+#24 35.73 Scanning dependencies of target actionlib_msgs_generate_messages_eus
+#24 35.73 Scanning dependencies of target sensor_msgs_generate_messages_cpp
+#24 35.73 [  0%] Built target actionlib_generate_messages_lisp
+#24 35.73 [  0%] Built target actionlib_generate_messages_cpp
+#24 35.74 Scanning dependencies of target rosgraph_msgs_generate_messages_eus
+#24 35.74 Scanning dependencies of target rviz_generate_messages_py
+#24 35.74 [  0%] Built target rosgraph_msgs_generate_messages_nodejs
+#24 35.74 [  0%] Built target rviz_generate_messages_cpp
+#24 35.74 [  0%] Built target actionlib_msgs_generate_messages_py
+#24 35.74 [  0%] Built target roscpp_generate_messages_lisp
+#24 35.74 [  0%] Built target rviz_generate_messages_lisp
+#24 35.74 Scanning dependencies of target roscpp_generate_messages_cpp
+#24 35.74 [  0%] Built target map_msgs_generate_messages_nodejs
+#24 35.74 [  0%] Built target std_srvs_generate_messages_py
+#24 35.74 [  0%] Built target rosgraph_msgs_generate_messages_eus
+#24 35.74 [  0%] Built target _decomp_ros_msgs_generate_messages_check_deps_EllipsoidArray
+#24 35.74 [  0%] Built target nav_msgs_generate_messages_nodejs
+#24 35.74 [  0%] Built target rviz_generate_messages_py
+#24 35.75 [  0%] Built target actionlib_msgs_generate_messages_eus
+#24 35.75 [  0%] Built target sensor_msgs_generate_messages_cpp
+#24 35.75 Scanning dependencies of target actionlib_msgs_generate_messages_lisp
+#24 35.75 Scanning dependencies of target tf_generate_messages_py
+#24 35.75 Scanning dependencies of target roscpp_generate_messages_py
+#24 35.75 [  0%] Built target _decomp_ros_msgs_generate_messages_check_deps_PolyhedronArray
+#24 35.75 Scanning dependencies of target actionlib_msgs_generate_messages_nodejs
+#24 35.75 Scanning dependencies of target sensor_msgs_generate_messages_nodejs
+#24 35.75 Scanning dependencies of target actionlib_generate_messages_py
+#24 35.75 [  0%] Built target roscpp_generate_messages_cpp
+#24 35.75 [  0%] Built target _decomp_ros_msgs_generate_messages_check_deps_Ellipsoid
+#24 35.75 Scanning dependencies of target sensor_msgs_generate_messages_lisp
+#24 35.75 Scanning dependencies of target sensor_msgs_generate_messages_py
+#24 35.75 Scanning dependencies of target roscpp_generate_messages_eus
+#24 35.75 Scanning dependencies of target rviz_generate_messages_nodejs
+#24 35.75 Scanning dependencies of target sensor_msgs_generate_messages_eus
+#24 35.75 Scanning dependencies of target visualization_msgs_generate_messages_cpp
+#24 35.75 Scanning dependencies of target tf2_msgs_generate_messages_eus
+#24 35.76 Scanning dependencies of target rosgraph_msgs_generate_messages_py
+#24 35.76 [  0%] Built target _decomp_ros_msgs_generate_messages_check_deps_Polyhedron
+#24 35.76 [  0%] Built target roscpp_generate_messages_eus
+#24 35.76 [  0%] Built target actionlib_generate_messages_py
+#24 35.76 [  0%] Built target tf_generate_messages_py
+#24 35.76 [  0%] Built target sensor_msgs_generate_messages_nodejs
+#24 35.76 [  0%] Built target rviz_generate_messages_nodejs
+#24 35.76 [  0%] Built target actionlib_msgs_generate_messages_lisp
+#24 35.76 [  0%] Built target sensor_msgs_generate_messages_lisp
+#24 35.76 [  0%] Built target roscpp_generate_messages_py
+#24 35.76 [  0%] Built target actionlib_msgs_generate_messages_nodejs
+#24 35.76 [  0%] Built target rosgraph_msgs_generate_messages_py
+#24 35.76 [  0%] Built target tf2_msgs_generate_messages_eus
+#24 35.76 [  0%] Built target sensor_msgs_generate_messages_eus
+#24 35.76 [  0%] Built target visualization_msgs_generate_messages_cpp
+#24 35.77 [  0%] Built target sensor_msgs_generate_messages_py
+#24 35.77 Scanning dependencies of target tf2_msgs_generate_messages_cpp
+#24 35.77 Scanning dependencies of target roscpp_generate_messages_nodejs
+#24 35.77 Scanning dependencies of target tf2_msgs_generate_messages_py
+#24 35.77 Scanning dependencies of target tf_generate_messages_eus
+#24 35.77 Scanning dependencies of target std_srvs_generate_messages_cpp
+#24 35.77 Scanning dependencies of target visualization_msgs_generate_messages_eus
+#24 35.77 Scanning dependencies of target nav_msgs_generate_messages_cpp
+#24 35.77 Scanning dependencies of target tf2_msgs_generate_messages_nodejs
+#24 35.77 Scanning dependencies of target rosgraph_msgs_generate_messages_lisp
+#24 35.77 Scanning dependencies of target actionlib_generate_messages_eus
+#24 35.77 Scanning dependencies of target tf2_msgs_generate_messages_lisp
+#24 35.77 Scanning dependencies of target visualization_msgs_generate_messages_lisp
+#24 35.77 Scanning dependencies of target visualization_msgs_generate_messages_nodejs
+#24 35.77 Scanning dependencies of target rosgraph_msgs_generate_messages_cpp
+#24 35.78 Scanning dependencies of target map_msgs_generate_messages_cpp
+#24 35.78 Scanning dependencies of target rviz_generate_messages_eus
+#24 35.78 [  0%] Built target tf2_msgs_generate_messages_cpp
+#24 35.78 [  0%] Built target roscpp_generate_messages_nodejs
+#24 35.78 Scanning dependencies of target visualization_msgs_generate_messages_py
+#24 35.78 Scanning dependencies of target nav_msgs_generate_messages_py
+#24 35.78 Scanning dependencies of target tf_generate_messages_lisp
+#24 35.78 [  0%] Built target visualization_msgs_generate_messages_nodejs
+#24 35.78 [  0%] Built target actionlib_generate_messages_eus
+#24 35.78 [  0%] Built target tf2_msgs_generate_messages_lisp
+#24 35.78 [  0%] Built target visualization_msgs_generate_messages_lisp
+#24 35.78 [  0%] Built target tf2_msgs_generate_messages_nodejs
+#24 35.78 [  0%] Built target visualization_msgs_generate_messages_eus
+#24 35.78 Scanning dependencies of target tf_generate_messages_cpp
+#24 35.79 [  0%] Built target nav_msgs_generate_messages_cpp
+#24 35.79 [  0%] Built target std_srvs_generate_messages_cpp
+#24 35.79 [  0%] Built target tf_generate_messages_eus
+#24 35.79 [  0%] Built target rosgraph_msgs_generate_messages_lisp
+#24 35.79 [  0%] Built target map_msgs_generate_messages_cpp
+#24 35.79 [  0%] Built target rosgraph_msgs_generate_messages_cpp
+#24 35.79 make[2]: Warning: File '/catkin_ws/src/shiviz_px4_nav/src/utils/rviz_plugins/src/goal_tool.h' has modification time 21221 s in the future
+#24 35.79 [  0%] Built target tf2_msgs_generate_messages_py
+#24 35.79 [  0%] Built target rviz_generate_messages_eus
+#24 35.79 [  0%] Built target visualization_msgs_generate_messages_py
+#24 35.79 Scanning dependencies of target map_msgs_generate_messages_py
+#24 35.79 Scanning dependencies of target map_msgs_generate_messages_lisp
+#24 35.79 Scanning dependencies of target tf_generate_messages_nodejs
+#24 35.79 [  0%] Built target nav_msgs_generate_messages_py
+#24 35.79 [  0%] Built target tf_generate_messages_lisp
+#24 35.80 [  0%] Built target tf_generate_messages_cpp
+#24 35.80 Scanning dependencies of target nav_msgs_generate_messages_lisp
+#24 35.80 Scanning dependencies of target std_srvs_generate_messages_eus
+#24 35.80 Scanning dependencies of target std_srvs_generate_messages_lisp
+#24 35.80 make[2]: Warning: File '/catkin_ws/src/shiviz_px4_nav/src/utils/DecompROS/decomp_ros_msgs/msg/Ellipsoid.msg' has modification time 21221 s in the future
+#24 35.80 make[2]: Warning: File '/catkin_ws/src/shiviz_px4_nav/src/utils/DecompROS/decomp_ros_msgs/msg/Ellipsoid.msg' has modification time 21221 s in the future
+#24 35.80 make[2]: Warning: File '/catkin_ws/src/shiviz_px4_nav/src/utils/DecompROS/decomp_ros_msgs/msg/Ellipsoid.msg' has modification time 21221 s in the future
+#24 35.80 make[2]: Warning: File '/catkin_ws/src/shiviz_px4_nav/src/utils/DecompROS/decomp_ros_msgs/msg/Ellipsoid.msg' has modification time 21221 s in the future
+#24 35.80 [  0%] Built target tf_generate_messages_nodejs
+#24 35.80 [  0%] Built target map_msgs_generate_messages_lisp
+#24 35.80 [  0%] Built target map_msgs_generate_messages_py
+#24 35.80 [  0%] Built target nav_msgs_generate_messages_lisp
+#24 35.80 [  2%] Generating Javascript code from decomp_ros_msgs/Ellipsoid.msg
+#24 35.80 [  5%] Generating Javascript code from decomp_ros_msgs/EllipsoidArray.msg
+#24 35.81 [  8%] Generating src/moc_goal_tool.cpp
+#24 35.81 [ 11%] Generating Javascript code from decomp_ros_msgs/PolyhedronArray.msg
+#24 35.81 [ 13%] Generating Javascript code from decomp_ros_msgs/Polyhedron.msg
+#24 35.81 make[2]: Warning: File '/catkin_ws/src/shiviz_px4_nav/src/utils/DecompROS/decomp_ros_msgs/msg/Ellipsoid.msg' has modification time 21221 s in the future
+#24 35.81 [ 13%] Built target std_srvs_generate_messages_lisp
+#24 35.81 [ 16%] Generating C++ code from decomp_ros_msgs/Polyhedron.msg
+#24 35.81 [ 19%] Generating EusLisp code from decomp_ros_msgs/Ellipsoid.msg
+#24 35.81 [ 22%] Generating Lisp code from decomp_ros_msgs/Ellipsoid.msg
+#24 35.81 [ 27%] Generating C++ code from decomp_ros_msgs/Ellipsoid.msg
+#24 35.81 [ 30%] Generating EusLisp code from decomp_ros_msgs/Polyhedron.msg
+#24 35.81 [ 30%] Generating C++ code from decomp_ros_msgs/EllipsoidArray.msg
+#24 35.81 [ 33%] Generating EusLisp code from decomp_ros_msgs/EllipsoidArray.msg
+#24 35.81 [ 36%] Generating EusLisp code from decomp_ros_msgs/PolyhedronArray.msg
+#24 35.81 [ 38%] Generating C++ code from decomp_ros_msgs/PolyhedronArray.msg
+#24 35.81 [ 41%] Generating Lisp code from decomp_ros_msgs/EllipsoidArray.msg
+#24 35.81 [ 41%] Built target std_srvs_generate_messages_eus
+#24 35.81 [ 44%] Generating Python from MSG decomp_ros_msgs/Ellipsoid
+#24 35.81 [ 47%] Generating Lisp code from decomp_ros_msgs/Polyhedron.msg
+#24 35.81 [ 50%] Generating Python from MSG decomp_ros_msgs/Polyhedron
+#24 35.82 [ 52%] Generating Python from MSG decomp_ros_msgs/EllipsoidArray
+#24 35.82 [ 55%] Generating Lisp code from decomp_ros_msgs/PolyhedronArray.msg
+#24 35.86 make[2]: warning:  Clock skew detected.  Your build may be incomplete.
+#24 35.87 [ 58%] Generating Python from MSG decomp_ros_msgs/PolyhedronArray
+#24 35.87 [ 58%] Built target decomp_ros_msgs_generate_messages_nodejs
+#24 35.88 Scanning dependencies of target rviz_plugins
+#24 35.88 make[2]: warning:  Clock skew detected.  Your build may be incomplete.
+#24 35.88 make[2]: Warning: File '/catkin_ws/src/shiviz_px4_nav/src/utils/rviz_plugins/src/pose_tool.cpp' has modification time 21221 s in the future
+#24 35.89 make[2]: warning:  Clock skew detected.  Your build may be incomplete.
+#24 35.90 [ 63%] Building CXX object shiviz_px4_nav/src/utils/rviz_plugins/CMakeFiles/rviz_plugins.dir/src/pose_tool.cpp.o
+#24 35.90 [ 63%] Building CXX object shiviz_px4_nav/src/utils/rviz_plugins/CMakeFiles/rviz_plugins.dir/src/goal_tool.cpp.o
+#24 35.90 [ 63%] Built target decomp_ros_msgs_generate_messages_lisp
+#24 35.90 [ 63%] Generating src/moc_goal_tool.cpp
+#24 35.91 make[2]: warning:  Clock skew detected.  Your build may be incomplete.
+#24 35.91 [ 66%] Building CXX object shiviz_px4_nav/src/utils/rviz_plugins/CMakeFiles/rviz_plugins.dir/src/moc_goal_tool.cpp.o
+#24 35.92 [ 69%] Built target decomp_ros_msgs_generate_messages_eus
+#24 35.92 make[2]: warning:  Clock skew detected.  Your build may be incomplete.
+#24 35.93 [ 69%] Built target decomp_ros_msgs_generate_messages_cpp
+#24 36.02 [ 72%] Generating Python msg __init__.py for decomp_ros_msgs
+#24 36.13 make[2]: warning:  Clock skew detected.  Your build may be incomplete.
+#24 36.14 [ 72%] Built target decomp_ros_msgs_generate_messages_py
+#24 36.15 Scanning dependencies of target decomp_rviz_plugins_autogen
+#24 36.15 [ 75%] Built target decomp_ros_msgs_generate_messages
+#24 36.15 [ 75%] Automatic MOC for target decomp_rviz_plugins
+#24 37.17 [ 75%] Built target decomp_rviz_plugins_autogen
+#24 37.23 Scanning dependencies of target decomp_rviz_plugins
+#24 37.23 make[2]: Warning: File '/catkin_ws/src/shiviz_px4_nav/src/utils/DecompROS/decomp_ros_utils/include/decomp_basis/data_type.h' has modification time 21220 s in the future
+#24 37.24 [ 80%] Building CXX object shiviz_px4_nav/src/utils/DecompROS/decomp_ros_utils/CMakeFiles/decomp_rviz_plugins.dir/src/mesh_visual.cpp.o
+#24 37.24 [ 83%] Building CXX object shiviz_px4_nav/src/utils/DecompROS/decomp_ros_utils/CMakeFiles/decomp_rviz_plugins.dir/src/bound_visual.cpp.o
+#24 37.24 [ 83%] Building CXX object shiviz_px4_nav/src/utils/DecompROS/decomp_ros_utils/CMakeFiles/decomp_rviz_plugins.dir/decomp_rviz_plugins_autogen/mocs_compilation.cpp.o
+#24 37.25 [ 86%] Building CXX object shiviz_px4_nav/src/utils/DecompROS/decomp_ros_utils/CMakeFiles/decomp_rviz_plugins.dir/src/polyhedron_array_display.cpp.o
+#24 37.25 [ 91%] Building CXX object shiviz_px4_nav/src/utils/DecompROS/decomp_ros_utils/CMakeFiles/decomp_rviz_plugins.dir/src/vector_visual.cpp.o
+#24 37.25 [ 91%] Building CXX object shiviz_px4_nav/src/utils/DecompROS/decomp_ros_utils/CMakeFiles/decomp_rviz_plugins.dir/src/ellipsoid_array_visual.cpp.o
+#24 37.25 [ 94%] Building CXX object shiviz_px4_nav/src/utils/DecompROS/decomp_ros_utils/CMakeFiles/decomp_rviz_plugins.dir/src/ellipsoid_array_display.cpp.o
+#24 39.65 [ 97%] Linking CXX shared library /catkin_ws/devel/lib/librviz_plugins.so
+#24 39.90 make[2]: warning:  Clock skew detected.  Your build may be incomplete.
+#24 39.90 [ 97%] Built target rviz_plugins
+#24 52.17 [100%] Linking CXX shared library /catkin_ws/devel/lib/libdecomp_rviz_plugins.so
+#24 52.46 make[2]: warning:  Clock skew detected.  Your build may be incomplete.
+#24 52.46 [100%] Built target decomp_rviz_plugins
+#24 52.47 Base path: /catkin_ws
+#24 52.47 Source space: /catkin_ws/src
+#24 52.47 Build space: /catkin_ws/build
+#24 52.47 Devel space: /catkin_ws/devel
+#24 52.47 Install space: /catkin_ws/install
+#24 52.47 Whitelisted packages: catkin_simple, decomp_ros_msgs, decomp_ros_utils, rviz_plugins
+#24 52.47 ####
+#24 52.47 #### Running command: "cmake /catkin_ws/src -DCMAKE_BUILD_TYPE=Release -DCATKIN_DEVEL_PREFIX=/catkin_ws/devel -DCMAKE_INSTALL_PREFIX=/catkin_ws/install -DCATKIN_WHITELIST_PACKAGES=catkin_simple;decomp_ros_msgs;decomp_ros_utils;rviz_plugins -G Unix Makefiles" in "/catkin_ws/build"
+#24 52.47 ####
+#24 52.47 ####
+#24 52.47 #### Running command: "make -j20 -l20" in "/catkin_ws/build"
+#24 52.47 ####
+#24 52.47 Build complete. Listing packages:
+#24 52.48 total 1760
+#24 52.48 drwxr-xr-x 7 root root   4096 Oct 27 05:38 .
+#24 52.48 drwxr-xr-x 5 root root   4096 Oct 27 05:38 ..
+#24 52.48 -rwxr-xr-x 1 root root  16832 Oct 27 05:38 libdecode_msgs.so
+#24 52.48 -rwxr-xr-x 1 root root 900016 Oct 27 05:38 libdecomp_rviz_plugins.so
+#24 52.48 -rwxr-xr-x 1 root root  17064 Oct 27 05:38 libencode_msgs.so
+#24 52.48 -rwxr-xr-x 1 root root 111288 Oct 27 05:38 libpose_utils.so
+#24 52.48 -rwxr-xr-x 1 root root 173712 Oct 27 05:38 librviz_plugins.so
+#24 52.48 lrwxrwxrwx 1 root root     18 Oct 27 05:38 libyaml-cpp.so -> libyaml-cpp.so.0.8
+#24 52.48 lrwxrwxrwx 1 root root     20 Oct 27 05:38 libyaml-cpp.so.0.8 -> libyaml-cpp.so.0.8.0
+#24 52.48 -rwxr-xr-x 1 root root 536624 Oct 27 05:38 libyaml-cpp.so.0.8.0
+#24 52.48 drwxr-xr-x 2 root root   4096 Oct 27 05:38 pkgconfig
+#24 52.48 drwxr-xr-x 2 root root   4096 Oct 27 05:38 px4_offboard
+#24 52.48 drwxr-xr-x 2 root root   4096 Oct 27 05:38 px4ctrl
+#24 52.48 drwxr-xr-x 3 root root   4096 Oct 27 05:38 python3
+#24 52.48 drwxr-xr-x 2 root root   4096 Oct 27 05:38 uav_utils
+#24 DONE 52.5s
+
+#25 [21/24] RUN echo "source /opt/ros/noetic/setup.bash" >> /root/.bashrc &&     echo "source /catkin_ws/devel/setup.bash" >> /root/.bashrc &&     echo "export ROS_MASTER_URI=http://localhost:11311" >> /root/.bashrc &&     echo "export ROS_HOSTNAME=localhost" >> /root/.bashrc &&     echo "export ROS_IP=localhost" >> /root/.bashrc
+#25 DONE 0.3s
+
+#26 [22/24] COPY docker/.bashrc /root/.bashrc_custom
+#26 DONE 0.0s
+
+#27 [23/24] RUN cat /root/.bashrc_custom >> /root/.bashrc
+#27 DONE 0.3s
+
+#28 [24/24] WORKDIR /catkin_ws
+#28 DONE 0.0s
+
+#29 exporting to image
+#29 exporting layers
+#29 exporting layers 5.5s done
+#29 writing image sha256:f64878c1465b194183938f63bac121cc5fa2ff5975c75c630faca02d23e2e668 done
+#29 naming to docker.io/1nrobotics/shiviz_px4_nav:local done
+#29 DONE 5.5s
+
+[0;34m🧹 Step 1.5: Cleaning up dangling Docker images...[0m
+Deleted Images:
+deleted: sha256:4a66c5e9022f285619f0e3db08a105bc2efa391153259058af0a6ebb1466807e
+
+Total reclaimed space: 0B
+
+[0;34m� Step 2: Stopping existing container...[0m
+
+[0;34m� Step 3: Starting new container locally...[0m
+15dfe375412542e65ac8eef10e65a9f1f8c6e89033e4bfe882b03e4f943f9d33
+
+[0;34m📊 Step 4: Checking container status...[0m
+CONTAINER ID   IMAGE                             COMMAND                  CREATED                  STATUS                  PORTS     NAMES
+15dfe3754125   1nrobotics/shiviz_px4_nav:local   "/ros_entrypoint.sh …"   Less than a second ago   Up Less than a second             shiviz_nav_local
+
+[0;32m✅ Local deployment completed![0m
+
+[0;34mUseful commands:[0m
+  View logs:    docker logs -f shiviz_nav_local
+  Stop:         docker stop shiviz_nav_local
+  Shell access: docker exec -it shiviz_nav_local bash
+  Status:       docker ps --filter name=shiviz_nav_local
+
+[1;33mTo start ROS navigation manually:[0m
+  docker exec -it shiviz_nav_local bash
+  # Inside container: source /catkin_ws/devel/setup.bash
+  # Then run: roslaunch shiviz_px4_nav px4_offboard.launch

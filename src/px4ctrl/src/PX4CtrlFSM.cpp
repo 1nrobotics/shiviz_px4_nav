@@ -4,11 +4,9 @@
 using namespace std;
 using namespace uav_utils;
 
-namespace px4ctrl {
-
 PX4CtrlFSM::PX4CtrlFSM(Parameter_t &param_, LinearControl &controller_) : param(param_), controller(controller_) /*, thrust_curve(thrust_curve_)*/
 {
-	state_ = FlightState::ManualControl;
+	state = MANUAL_CTRL;
 	hover_pose.setZero();
 }
 
@@ -46,32 +44,32 @@ void PX4CtrlFSM::process()
 	bool rotor_low_speed_during_land = false;
 
 	// STEP1: state machine runs
-	switch (state_)
+	switch (state)
 	{
-	case FlightState::ManualControl:
+	case MANUAL_CTRL:
 	{
 		if (rc_data.enter_hover_mode) // Try to jump to AUTO_HOVER
 		{
-			if (!isOdometryReceived(now_time))
+			if (!odom_is_received(now_time))
 			{
 				ROS_ERROR("[px4ctrl] Reject AUTO_HOVER(L2). No odom!");
 				break;
 			}
-			if (isCommandReceived(now_time))
+			if (cmd_is_received(now_time))
 			{
 				ROS_ERROR("[px4ctrl] Reject AUTO_HOVER(L2). You are sending commands before toggling into AUTO_HOVER, which is not allowed. Stop sending commands now!");
 				break;
 			}
 			if (odom_data.v.norm() > 3.0)
 			{
-				ROS_ERROR("[px4ctrl] Reject AUTO_HOVER(L2). Odom_Vel=%fm/s, which seems that the localization module goes wrong!", odom_data.v.norm());
+				ROS_ERROR("[px4ctrl] Reject AUTO_HOVER(L2). Odom_Vel=%fm/s, which seems that the locolization module goes wrong!", odom_data.v.norm());
 				break;
 			}
 
-			state_ = FlightState::AutoHover;
+			state = AUTO_HOVER;
 			controller.resetThrustMapping();
-			setHoverWithOdometry();
-			toggleOffboardMode(true);
+			set_hov_with_odom();
+			toggle_offboard_mode(true);
 
 			ROS_INFO("\033[32m[px4ctrl] MANUAL_CTRL(L1) --> AUTO_HOVER(L2)\033[32m");
 		}
@@ -654,5 +652,3 @@ void PX4CtrlFSM::reboot_FCU()
 	// if (param.print_dbg)
 	// 	printf("reboot result=%d(uint8_t), success=%d(uint8_t)\n", reboot_srv.response.result, reboot_srv.response.success);
 }
-
-}  // namespace px4ctrl
