@@ -49,6 +49,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ros-${ROS_DISTRO}-pcl-conversions \
     ros-${ROS_DISTRO}-eigen-conversions \
     ros-${ROS_DISTRO}-cmake-modules \
+    ros-${ROS_DISTRO}-rviz \
     && rm -rf /var/lib/apt/lists/*
 
 # Install system dependencies
@@ -141,15 +142,12 @@ COPY tools/ecal.ini /etc/ecal/ecal.ini
 # Initialize and build the workspace
 WORKDIR /catkin_ws/
 RUN source /opt/ros/noetic/setup.bash \
-    && catkin init \
-    && catkin config --extend /opt/ros/noetic \
-    && catkin config --cmake-args -DCMAKE_BUILD_TYPE=Release \
     && rosdep update \
     && rosdep install --from-paths src --ignore-src -r -y \
-    && echo "Building all packages in workspace..." \
-    && catkin build --verbose \
-    && echo "Build complete. Packages built:" \
-    && catkin list
+    && echo "Building all packages in workspace with catkin_make..." \
+    && catkin_make -DCMAKE_BUILD_TYPE=Release \
+    && echo "Build complete. Listing packages:" \
+    && ls -la devel/lib/
 
 # Set up environment in bashrc
 RUN echo "source /opt/ros/noetic/setup.bash" >> /root/.bashrc && \

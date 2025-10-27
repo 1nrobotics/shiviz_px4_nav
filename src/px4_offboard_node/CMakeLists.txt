@@ -26,7 +26,7 @@ catkin_package(
 )
 set(YAML_BUILD_SHARED_LIBS ON CACHE BOOL "Build shared libraries")
 
-add_subdirectory(../../thirdparty/yaml-cpp)
+add_subdirectory(../../thirdparty/yaml-cpp ${CMAKE_CURRENT_BINARY_DIR}/yaml-cpp)
 
 add_executable(${PROJECT_NAME}_node 
   src/main.cpp 
@@ -36,7 +36,6 @@ add_executable(${PROJECT_NAME}_node
 target_include_directories(${PROJECT_NAME}_node
     PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../include
     ${catkin_INCLUDE_DIRS}
 )
 
@@ -58,12 +57,12 @@ install(TARGETS yaml-cpp
     RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
 )
 
-install(DIRECTORY ../../config/
+install(DIRECTORY config/
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/config
   FILES_MATCHING PATTERN "*.yaml"
 )
 
-install(DIRECTORY ../../launch/
+install(DIRECTORY launch/
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
   FILES_MATCHING PATTERN "*.launch"
 )
